@@ -1,110 +1,179 @@
+/* ===========================
+   Full-System 61-Day Challenge
+   Clean Modern Design
+   =========================== */
+
 :root {
-  --ink:#0e0e0e;
-  --muted:#60646c;
-  --line:#e6e6e9;
-  --bg:#ffffff;
+  --bg: #0e0e0e;
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --accent: #00c2ff;
+  --text: #f8f8f8;
+  --muted: #9b9b9b;
+  --line: rgba(255, 255, 255, 0.1);
+  --check: #00e676;
+  --shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
-@page {
-  size: A4;
-  margin: 16mm 14mm;
+* {
+  box-sizing: border-box;
 }
-
-* { box-sizing: border-box; }
 
 body {
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  color: var(--ink);
-  background: var(--bg);
-  line-height: 1.4;
   margin: 0;
-  padding: 0 10px 40px;
+  padding: 0 2rem 4rem;
+  background: linear-gradient(180deg, #111 0%, #0e0e0e 100%);
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  color: var(--text);
+  line-height: 1.5;
 }
 
 header {
-  border-bottom: 2px solid var(--ink);
-  padding: 10px 0 12px 0;
-  margin-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+  padding: 1.5rem 0;
+  margin-bottom: 2rem;
+  text-align: center;
 }
 
 h1 {
-  margin: 0 0 6px 0;
-  font-size: 26px;
-  letter-spacing: .2px;
+  margin: 0;
+  font-size: 2rem;
+  letter-spacing: 0.5px;
+  color: var(--accent);
 }
 
 .meta {
-  font-size: 12px; color: var(--muted);
-  display: flex; flex-wrap: wrap; gap: 12px;
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-top: 0.6rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
 }
 
 .legend {
-  display: grid; grid-template-columns: repeat(3,1fr);
-  gap: 10px; margin: 12px 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
 }
 
 .card {
+  background: var(--card-bg);
   border: 1px solid var(--line);
-  border-radius: 6px;
-  padding: 10px;
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(4px);
+  width: 260px;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
 }
 
 .card h3 {
-  margin: 0 0 6px 0; font-size: 14px; text-transform: uppercase; letter-spacing: .6px;
+  margin: 0 0 0.4rem 0;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--accent);
 }
 
-section.phase { break-inside: avoid-page; margin: 14px 0; }
+section.phase {
+  margin: 3rem 0;
+}
+
 section.phase h2 {
-  font-size: 18px; margin: 0 0 8px 0; padding-top: 8px; border-top: 1px solid var(--ink);
+  font-size: 1.3rem;
+  border-left: 3px solid var(--accent);
+  padding-left: 0.6rem;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
 }
 
 table {
-  width: 100%; border-collapse: collapse; font-size: 12.5px; margin-bottom: 10px;
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+  background: var(--card-bg);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
 }
 
 th, td {
-  border: 1px solid var(--line); padding: 8px 6px; vertical-align: top;
+  border: 1px solid var(--line);
+  padding: 10px 8px;
+  font-size: 0.9rem;
+  vertical-align: top;
 }
 
 th {
-  background: #f7f7f9; text-align: left; font-weight: 700;
+  background: rgba(255, 255, 255, 0.05);
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.5px;
+  text-align: left;
 }
 
-th.day, td.day { width: 9%; white-space: nowrap; }
-th.body, td.body { width: 28%; }
-th.mind, td.mind { width: 28%; }
-th.behavior, td.behavior { width: 23%; }
-th.check, td.check { width: 5%; text-align:center; }
-th.notes, td.notes { width: 12%; }
+tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.02);
+}
 
 .checkbox {
-  display:inline-block; width: 16px; height:16px;
-  border:1.5px solid var(--ink); border-radius:2px;
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--accent);
+  border-radius: 4px;
   cursor: pointer;
-  position: relative;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
+  justify-content: center;
+  align-items: center;
+  background: transparent;
 }
 
 .checkbox.checked {
-  background: var(--ink);
+  background: var(--check);
+  border-color: var(--check);
+  transform: scale(1.1);
+  box-shadow: 0 0 8px var(--check);
 }
 
 .checkbox.checked::after {
-  content: "✓";
-  color: white;
-  position: absolute;
-  top: -1px;
-  left: 2px;
-  font-size: 13px;
+  content: "✔";
+  color: #111;
+  font-size: 12px;
 }
 
-footer .print-footer {
-  font-size: 10px; color: var(--muted); text-align: right; border-top: 1px solid var(--line);
-  margin-top: 8px; padding-top: 6px;
+footer {
+  text-align: right;
+  border-top: 1px solid var(--line);
+  margin-top: 2rem;
+  padding-top: 1rem;
+  color: var(--muted);
+  font-size: 0.8rem;
 }
 
-@media print {
-  .legend { break-inside: avoid; }
-  section.phase { break-inside: avoid; }
-  .checkbox { border-color: black; }
+/* Responsive tweaks */
+@media (max-width: 900px) {
+  body {
+    padding: 0 1rem;
+  }
+  table {
+    font-size: 0.8rem;
+  }
+  .legend {
+    flex-direction: column;
+    align-items: center;
+  }
+  .card {
+    width: 90%;
+  }
 }
