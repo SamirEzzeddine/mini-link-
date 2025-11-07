@@ -91,3 +91,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initialize display
   updateProgress();
 });
+#progress-fill {
+  box-shadow: 0 0 10px rgba(0, 226, 118, 0.8);
+}
