@@ -3,17 +3,73 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dopamine Reset — Phase 1 Tracker</title>
+  <title>Phase 1 — Cleanse & Reset</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
-    <h1>Dopamine Reset — Phase 1</h1>
+    <h1>Phase 1</h1>
     <p class="subtitle">Discipline. Focus. No Excuses.</p>
   </header>
 
   <main>
-    <!-- Daily Progress -->
+    <!-- Phase meta -->
+    <section id="phaseMeta">
+      <h2>Mission: Cleanse & Reset (14 Days)</h2>
+      <p>
+        You are eliminating fake dopamine, rebuilding focus, and retraining your brain to reward effort.
+        Free time windows are <strong>05:00–07:30</strong> and <strong>19:00–22:00</strong>. Everything here serves that mission.
+      </p>
+      <div class="progress-wrap">
+        <span id="dateDisplay"></span> · <span id="dayOf14">Day 1/14</span>
+        <button id="restartPhase" style="float:right">Restart Phase 1</button>
+      </div>
+    </section>
+
+    <!-- Rules -->
+    <section id="rules">
+      <h2>Rules of Engagement</h2>
+      <ul>
+        <li>No porn, no edging, no “just checking.”</li>
+        <li>No scrolling (reels/shorts/doom). Use tech for purpose only.</li>
+        <li>No sugar binges. Protein-forward meals. Caffeine stops by 19:00.</li>
+        <li>Move daily • Write nightly • Sleep 7–8h • Screens off after 21:00.</li>
+        <li>Urge protocol: leave room → cold water → 20 push-ups → 5–10 min walk → do one task.</li>
+      </ul>
+    </section>
+
+    <!-- Morning Block -->
+    <section id="morningBlock">
+      <h2>Morning Block (05:00–07:30)</h2>
+      <div id="morningTasks" class="grid"></div>
+      <div class="progress-wrap">
+        <progress id="morningProgress" value="0" max="5"></progress>
+        <span id="morningStats">0 / 5 complete</span>
+      </div>
+    </section>
+
+    <!-- Evening Block -->
+    <section id="eveningBlock">
+      <h2>Evening Block (19:00–22:00)</h2>
+      <div id="eveningTasks" class="grid"></div>
+      <div class="progress-wrap">
+        <progress id="eveningProgress" value="0" max="5"></progress>
+        <span id="eveningStats">0 / 5 complete</span>
+      </div>
+    </section>
+
+    <!-- Weekly Program -->
+    <section id="weekly">
+      <h2>Weekly Engineering</h2>
+      <p class="subtitle" id="weekTitle">Week 1 — Purge (strip cheap dopamine, survive boredom, build baseline)</p>
+      <div id="weekContainer" class="week-grid"></div>
+      <div class="progress-wrap">
+        <progress id="weekProgress" value="0" max="28"></progress>
+        <span id="weekStats">0 / 28 tasks complete</span>
+      </div>
+    </section>
+
+    <!-- 24h Discipline Board (non-free hours are disabled) -->
     <section id="daily">
       <h2>Today’s 24-Hour Discipline Board</h2>
       <div id="hourContainer" class="grid"></div>
@@ -23,31 +79,21 @@
       </div>
     </section>
 
-    <!-- Weekly -->
-    <section id="weekly">
-      <h2>Weekly Task Board</h2>
-      <div id="weekContainer" class="week-grid"></div>
-      <div class="progress-wrap">
-        <progress id="weekProgress" value="0" max="28"></progress>
-        <span id="weekStats">0 / 28 tasks complete</span>
-      </div>
-    </section>
-
     <!-- Urge Log -->
     <section id="urge">
       <h2>Urge Log</h2>
-      <textarea id="urgeLog" placeholder="Record triggers, actions, and results..."></textarea>
+      <textarea id="urgeLog" placeholder="Time • Trigger • Response • Result. Example: 16:40 • Bored after study • Left room + cold water + 20 push-ups • urge gone in 6 min."></textarea>
     </section>
 
+    <!-- Controls -->
     <section id="controls">
       <button id="resetDay">Reset Day</button>
       <button id="resetWeek">Reset Week</button>
-      <p id="dateDisplay"></p>
     </section>
   </main>
 
   <footer>
-    <p>Phase 1 Discipline Tracker — Built for those who refuse mediocrity.</p>
+    <p>Phase 1 Discipline Tracker — Built to rewire, not entertain.</p>
   </footer>
 
   <script src="script.js"></script>
