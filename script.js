@@ -1,96 +1,109 @@
-// ===============================
-// Full-System 61-Day Challenge JS
-// ===============================
+// Build dynamic structure and persistent behavior
+const hourContainer = document.getElementById('hourContainer');
+const weekContainer = document.getElementById('weekContainer');
+const hourProgress = document.getElementById('hourProgress');
+const hourStats = document.getElementById('hourStats');
+const weekProgress = document.getElementById('weekProgress');
+const weekStats = document.getElementById('weekStats');
+const dateDisplay = document.getElementById('dateDisplay');
 
-document.addEventListener("DOMContentLoaded", () => {
-  const boxes = document.querySelectorAll(".checkbox");
-  const total = boxes.length;
-  const progressBar = document.createElement("div");
-  const progressFill = document.createElement("div");
-  const progressText = document.createElement("span");
-  const motivator = document.createElement("div");
+const today = new Date().toLocaleDateString();
+dateDisplay.textContent = `Date: ${today}`;
 
-  // ----- Progress Bar -----
-  progressBar.style.cssText = `
-    width: 100%;
-    background: rgba(255,255,255,0.1);
-    border-radius: 20px;
-    height: 16px;
-    margin: 20px 0;
-    overflow: hidden;
-    position: relative;
-  `;
-  progressFill.style.cssText = `
-    height: 100%;
-    width: 0%;
-    background: linear-gradient(90deg,#00e676,#00c2ff);
-    border-radius: 20px;
-    transition: width 0.4s ease;
-  `;
-  progressText.style.cssText = `
-    display: block;
-    font-size: 0.9rem;
-    color: #00e676;
-    text-align: right;
-    margin-top: 6px;
-    letter-spacing: 0.5px;
-  `;
-  motivator.style.cssText = `
-    font-size: 1rem;
-    text-align: center;
-    margin: 10px 0 25px;
-    color: #00c2ff;
-    font-weight: 600;
-  `;
-
-  // Insert the tracker below the header
-  const header = document.querySelector("header");
-  header.insertAdjacentElement("afterend", motivator);
-  header.insertAdjacentElement("afterend", progressText);
-  header.insertAdjacentElement("afterend", progressBar);
-  progressBar.appendChild(progressFill);
-
-  // Load saved states
-  boxes.forEach((box, i) => {
-    const key = `day_${i}_checked`;
-    if (localStorage.getItem(key) === "true") {
-      box.classList.add("checked");
-    }
-
-    box.addEventListener("click", () => {
-      box.classList.toggle("checked");
-      localStorage.setItem(key, box.classList.contains("checked"));
-      updateProgress();
-    });
-  });
-
-  // Motivational quotes by progress %
-  const quotes = [
-    [0, "Let’s start strong — first steps define the path."],
-    [10, "Momentum builds discipline. Keep stacking wins."],
-    [25, "A quarter done — don’t coast, accelerate."],
-    [50, "Halfway. Most people quit here. You won’t."],
-    [75, "You’re operating on a different level now."],
-    [90, "Discipline > Motivation. Finish what you started."],
-    [100, "System complete. You’ve earned every percent."]
-  ];
-
-  function updateProgress() {
-    const checked = document.querySelectorAll(".checkbox.checked").length;
-    const percent = Math.round((checked / total) * 100);
-    progressFill.style.width = `${percent}%`;
-    progressText.textContent = `${percent}% complete (${checked}/${total})`;
-    updateMotivator(percent);
-  }
-
-  function updateMotivator(percent) {
-    const quote = quotes.reduce((acc, [p, q]) => (percent >= p ? q : acc), "");
-    motivator.textContent = quote;
-  }
-
-  // Initialize display
-  updateProgress();
-});
-#progress-fill {
-  box-shadow: 0 0 10px rgba(0, 226, 118, 0.8);
+// --- Generate Hourly Tasks ---
+for (let i = 5; i < 29; i++) { // 05:00 to 04:00 next day
+  let hour = i % 24;
+  let label = `${hour.toString().padStart(2, '0')}:00`;
+  const id = `h${hour}`;
+  const div = document.createElement('div');
+  div.classList.add('hour-item');
+  div.innerHTML = `<input type="checkbox" id="${id}"><label for="${id}">${label}</label>`;
+  hourContainer.appendChild(div);
 }
+
+// --- Generate Weekly Tasks (4 per day x 7 days) ---
+const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+days.forEach((d, i) => {
+  for (let t = 1; t <= 4; t++) {
+    const id = `${d}${t}`;
+    const div = document.createElement('div');
+    div.classList.add('week-item');
+    div.innerHTML = `<input type="checkbox" id="${id}"><label for="${id}">${d} Task ${t}</label>`;
+    weekContainer.appendChild(div);
+  }
+});
+
+// --- LocalStorage Keys ---
+const hourKey = `hours-${today}`;
+const weekKey = `week-${today}`;
+const logKey = `urge-${today}`;
+
+// --- Restore Saved State ---
+function restore() {
+  const hourData = JSON.parse(localStorage.getItem(hourKey)) || {};
+  const weekData = JSON.parse(localStorage.getItem(weekKey)) || {};
+  const urgeText = localStorage.getItem(logKey) || '';
+
+  document.querySelectorAll('.hour-item input').forEach((cb) => {
+    cb.checked = hourData[cb.id] || false;
+  });
+  document.querySelectorAll('.week-item input').forEach((cb) => {
+    cb.checked = weekData[cb.id] || false;
+  });
+  document.getElementById('urgeLog').value = urgeText;
+  updateProgress();
+}
+
+// --- Update Progress ---
+function updateProgress() {
+  const hourBoxes = document.querySelectorAll('.hour-item input');
+  const weekBoxes = document.querySelectorAll('.week-item input');
+
+  const hoursDone = Array.from(hourBoxes).filter(cb => cb.checked).length;
+  const weekDone = Array.from(weekBoxes).filter(cb => cb.checked).length;
+
+  hourProgress.value = hoursDone;
+  weekProgress.value = weekDone;
+
+  hourStats.textContent = `${hoursDone} / ${hourBoxes.length} hours clean`;
+  weekStats.textContent = `${weekDone} / ${weekBoxes.length} tasks complete`;
+}
+
+// --- Save State ---
+function save() {
+  const hourData = {};
+  document.querySelectorAll('.hour-item input').forEach(cb => hourData[cb.id] = cb.checked);
+  localStorage.setItem(hourKey, JSON.stringify(hourData));
+
+  const weekData = {};
+  document.querySelectorAll('.week-item input').forEach(cb => weekData[cb.id] = cb.checked);
+  localStorage.setItem(weekKey, JSON.stringify(weekData));
+
+  const urgeText = document.getElementById('urgeLog').value;
+  localStorage.setItem(logKey, urgeText);
+
+  updateProgress();
+}
+
+// --- Reset Day/Week ---
+document.getElementById('resetDay').addEventListener('click', () => {
+  if (confirm('Reset all daily checkboxes?')) {
+    localStorage.removeItem(hourKey);
+    restore();
+  }
+});
+
+document.getElementById('resetWeek').addEventListener('click', () => {
+  if (confirm('Reset all weekly tasks?')) {
+    localStorage.removeItem(weekKey);
+    restore();
+  }
+});
+
+// --- Event Listeners ---
+document.body.addEventListener('change', save);
+document.getElementById('urgeLog').addEventListener('input', save);
+
+// --- Initialize ---
+restore();
+updateProgress();
