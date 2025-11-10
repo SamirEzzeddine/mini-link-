@@ -1,110 +1,305 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Phase 1 — Cleanse & Reset</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <header>
-    <h1>Phase 1</h1>
-    <p class="subtitle">Discipline. Focus. No Excuses.</p>
-  </header>
-
-  <main>
-    <!-- Phase meta -->
-    <section id="phaseMeta">
-      <h2>Mission: Cleanse & Reset (14 Days)</h2>
-      <p>
-        You are eliminating fake dopamine, rebuilding focus, and retraining your brain to reward effort.
-        Free time windows are <strong>05:00–07:30</strong> and <strong>19:00–22:00</strong>. Everything here serves that mission.
-      </p>
-      <div class="progress-wrap">
-        <span id="dateDisplay"></span> · <span id="dayOf14">Day 1/14</span>
-        <button id="restartPhase" style="float:right">Restart Phase 1</button>
-      </div>
-    </section>
-
-    <!-- Rules -->
-    <section id="rules">
-      <h2>Rules of Engagement</h2>
-      <ul>
-        <li>No porn, no edging, no “just checking.”</li>
-        <li>No scrolling (reels/shorts/doom). Use tech for purpose only.</li>
-        <li>No sugar binges. Protein-forward meals. Caffeine stops by 19:00.</li>
-        <li>Move daily • Write nightly • Sleep 7–8h • Screens off after 21:00.</li>
-        <li>Urge protocol: leave room → cold water → 20 push-ups → 5–10 min walk → do one task.</li>
-      </ul>
-    </section>
-
-    <!-- Morning Block -->
-    <section id="morningBlock">
-      <h2>Morning Block (05:00–07:30)</h2>
-      <div id="morningTasks" class="grid"></div>
-      <div class="progress-wrap">
-        <progress id="morningProgress" value="0" max="5"></progress>
-        <span id="morningStats">0 / 5 complete</span>
-      </div>
-    </section>
-
-    <!-- Evening Block -->
-    <section id="eveningBlock">
-      <h2>Evening Block (19:00–22:00)</h2>
-      <div id="eveningTasks" class="grid"></div>
-      <div class="progress-wrap">
-        <progress id="eveningProgress" value="0" max="5"></progress>
-        <span id="eveningStats">0 / 5 complete</span>
-      </div>
-    </section>
-
-    <!-- Weekly Program -->
-    <section id="weekly">
-      <h2>Weekly Engineering</h2>
-      <p class="subtitle" id="weekTitle">Week 1 — Purge (strip cheap dopamine, survive boredom, build baseline)</p>
-      <div id="weekContainer" class="week-grid"></div>
-      <div class="progress-wrap">
-        <progress id="weekProgress" value="0" max="28"></progress>
-        <span id="weekStats">0 / 28 tasks complete</span>
-      </div>
-    </section>
-
-    <!-- 24h Discipline Board (non-free hours are disabled) -->
-    <section id="daily">
-      <h2>Today’s 24-Hour Discipline Board</h2>
-      <div id="hourContainer" class="grid"></div>
-      <div class="progress-wrap">
-        <progress id="hourProgress" value="0" max="24"></progress>
-        <span id="hourStats">0 / 24 hours clean</span>
-      </div>
-    </section>
-
-    <!-- Urge Log -->
-    <section id="urge">
-      <h2>Urge Log</h2>
-      <textarea id="urgeLog" placeholder="Time • Trigger • Response • Result. Example: 16:40 • Bored after study • Left room + cold water + 20 push-ups • urge gone in 6 min."></textarea>
-    </section>
-
-    <!-- Controls -->
-    <section id="controls">
-      <button id="resetDay">Reset Day</button>
-      <button id="resetWeek">Reset Week</button>
-    </section>
-  </main>
-
-  <footer>
-    <p>Phase 1 Discipline Tracker — Built to rewire, not entertain.</p>
-  </footer>
-
-  <script src="script.js"></script>
-  <script>
-function applyTheme() {
-  const h = new Date().getHours();
-  document.body.classList.toggle('day-theme', h >= 5 && h < 18);
-  document.body.classList.toggle('night-theme', h >= 18 || h < 5);
+/* -----------------------------------------------------------
+   Phase-1 Tracker — Golden Discipline (Dynamic version)
+   clean, artistic, high-contrast with automatic day/night modes
+----------------------------------------------------------- */
+:root {
+  --bg: #181716;
+  --panel: #222324;
+  --ink: #fcfaf6;
+  --muted: #c7c3b6;
+  --accent: #e1b85a;
+  --accent-glow: #f7d98c;
+  --line: #343434;
+  --radius: 14px;
+  --font-title: "Cinzel", serif;
+  --font-body: "Inter", system-ui, sans-serif;
 }
-applyTheme();
-setInterval(applyTheme, 60 * 1000);
-</script>
-</body>
-</html>
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@400;600&display=swap');
+
+* { box-sizing: border-box; }
+
+html, body {
+  background: radial-gradient(circle at top left, #1d1c1b 0%, #161513 80%);
+  color: var(--ink);
+  margin: 0;
+  font-family: var(--font-body);
+  min-height: 100%;
+  transition: background 1s ease, color 1s ease;
+}
+
+/* -----------------------------------------------------------
+   Header
+----------------------------------------------------------- */
+header {
+  text-align: center;
+  padding: 2rem 1rem 1rem;
+  background: radial-gradient(circle at top, #2b2a28 0%, #1a1917 70%);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  transition: background 1s ease, border-color 1s ease;
+}
+
+h1 {
+  font-family: var(--font-title);
+  font-size: 2.3rem;
+  letter-spacing: 1px;
+  color: var(--accent);
+  text-shadow: 0 0 10px rgba(241,202,116,0.4);
+  margin: 0;
+}
+
+.subtitle {
+  color: var(--muted);
+  margin-top: .3rem;
+  font-size: 1rem;
+  letter-spacing: .3px;
+}
+
+/* -----------------------------------------------------------
+   Layout + Sections
+----------------------------------------------------------- */
+main {
+  max-width: 950px;
+  margin: 0 auto;
+  padding: 2rem 1rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+section {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.8rem 1.5rem;
+  box-shadow: 0 0 10px rgba(241,202,116,0.08);
+  transition: border-color .3s, box-shadow .3s, background .3s;
+}
+
+section:hover {
+  border-color: var(--accent);
+  background: #2a2a29;
+  box-shadow: 0 0 16px rgba(241,202,116,0.25);
+}
+
+h2 {
+  font-family: var(--font-title);
+  color: var(--accent);
+  font-weight: 600;
+  letter-spacing: .5px;
+  margin-top: 0;
+  text-shadow: 0 0 8px rgba(241,202,116,0.3);
+}
+
+ul { padding-left: 1.2rem; }
+li { margin: .45rem 0; }
+
+/* -----------------------------------------------------------
+   Grid Items
+----------------------------------------------------------- */
+.grid, .week-grid {
+  display: grid;
+  gap: .8rem;
+}
+
+.grid { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+.week-grid { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }
+
+.hour-item, .week-item {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  background: #2a2a29;
+  padding: .85rem 1rem;
+  border-radius: var(--radius);
+  border: 1px solid #3b3b3a;
+  transition: background .25s, transform .1s, box-shadow .2s;
+}
+
+.hour-item:hover, .week-item:hover {
+  background: #343432;
+  box-shadow: 0 0 6px rgba(241,202,116,0.25);
+  transform: translateY(-1px);
+}
+
+input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+label {
+  flex: 1;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+/* -----------------------------------------------------------
+   Progress Bars
+----------------------------------------------------------- */
+progress {
+  width: 100%;
+  height: 14px;
+  appearance: none;
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+progress::-webkit-progress-bar {
+  background: #3b3b3a;
+}
+
+progress::-webkit-progress-value {
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-glow) 100%);
+  box-shadow: 0 0 10px rgba(247,217,140,0.6);
+}
+
+progress::-moz-progress-bar {
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-glow) 100%);
+}
+
+.progress-wrap {
+  margin-top: 1rem;
+  text-align: center;
+  color: var(--muted);
+  font-size: .9rem;
+}
+
+/* -----------------------------------------------------------
+   Text Areas / Buttons
+----------------------------------------------------------- */
+textarea {
+  width: 100%;
+  min-height: 120px;
+  background: #242322;
+  color: var(--ink);
+  border: 1px solid #3a3a39;
+  border-radius: var(--radius);
+  padding: .8rem;
+  font-family: var(--font-body);
+  resize: vertical;
+  transition: border-color .2s, background .2s;
+}
+textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: #2c2b2a;
+}
+
+button {
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-glow) 100%);
+  color: #111;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius);
+  padding: .7rem 1.6rem;
+  margin: .3rem;
+  cursor: pointer;
+  transition: filter .2s, transform .1s;
+}
+button:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
+/* -----------------------------------------------------------
+   Footer
+----------------------------------------------------------- */
+footer {
+  text-align: center;
+  padding: 1.5rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: .85rem;
+  background: radial-gradient(circle at bottom, #2a2927 0%, #1a1917 80%);
+  transition: background 1s ease, color 1s ease;
+}
+
+/* -----------------------------------------------------------
+   Utility
+----------------------------------------------------------- */
+#dateDisplay, #dayOf14 {
+  color: var(--muted);
+  font-size: .95rem;
+}
+
+#weekTitle {
+  color: var(--accent);
+  font-style: italic;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 700px) {
+  h1 { font-size: 1.8rem; }
+  main { padding: 1.5rem .7rem 3rem; }
+}
+
+/* -----------------------------------------------------------
+   Dynamic Theme Variants
+----------------------------------------------------------- */
+body.day-theme {
+  --bg: #f9f6f1;
+  --panel: #fffaf0;
+  --ink: #1b1a17;
+  --muted: #5c584f;
+  --accent: #d4a63c;
+  --accent-glow: #f1c966;
+  --line: #e5dfd1;
+  background: radial-gradient(circle at top left, #fff7e2 0%, #f6ecd4 70%);
+  color: var(--ink);
+}
+
+body.day-theme header {
+  background: radial-gradient(circle at top, #fff2b6 0%, #f3e5b3 80%);
+  border-color: #e0d3a5;
+}
+
+body.day-theme section {
+  background: #fffaf0;
+  border-color: #f0e2b8;
+  box-shadow: 0 0 14px rgba(212,166,60,0.2);
+}
+
+body.day-theme section:hover {
+  background: #fff3ce;
+  border-color: #d4a63c;
+  box-shadow: 0 0 18px rgba(212,166,60,0.35);
+}
+
+body.day-theme footer {
+  background: radial-gradient(circle at bottom, #fff2b6 0%, #f4e5b6 80%);
+  color: #5c584f;
+}
+
+/* NIGHT THEME (default) */
+body.night-theme {
+  --bg: #181716;
+  --panel: #222324;
+  --ink: #fcfaf6;
+  --muted: #c7c3b6;
+  --accent: #e1b85a;
+  --accent-glow: #f7d98c;
+  --line: #343434;
+  background: radial-gradient(circle at top left, #1d1c1b 0%, #161513 80%);
+  color: var(--ink);
+}
+
+body.night-theme header {
+  background: radial-gradient(circle at top, #2b2a28 0%, #1a1917 70%);
+  border-color: var(--line);
+}
+
+body.night-theme section {
+  background: var(--panel);
+  border-color: var(--line);
+  box-shadow: 0 0 10px rgba(241,202,116,0.08);
+}
+
+body.night-theme footer {
+  background: radial-gradient(circle at bottom, #2a2927 0%, #1a1917 80%);
+}
