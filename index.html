@@ -97,5 +97,14 @@
   </footer>
 
   <script src="script.js"></script>
+  <script>
+function applyTheme() {
+  const h = new Date().getHours();
+  document.body.classList.toggle('day-theme', h >= 5 && h < 18);
+  document.body.classList.toggle('night-theme', h >= 18 || h < 5);
+}
+applyTheme();
+setInterval(applyTheme, 60 * 1000);
+</script>
 </body>
 </html>
