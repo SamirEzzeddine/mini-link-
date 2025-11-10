@@ -69,7 +69,7 @@ const weekPlan = {
   1: { // Purge
     title: 'Week 1 — Purge (strip cheap dopamine, survive boredom, build baseline)',
     days: [
-      ['No porn/edging all day', 'Cold exposure (30–60s)', 'Deep work 60m', 'Journal at 21:00'],
+      ['No addiction/edging all day', 'Cold exposure (30–60s)', 'Deep work 60m', 'Journal at 21:00'],
       ['No scrolling', '10,000 steps / long walk', 'Protein-focused meals', 'Lights out by 22:00'],
       ['No sugar binges', 'Deep work 90m (one task)', 'Leave phone outside room', 'Urge log 1+ entry'],
       ['No music during focus', 'Bodyweight circuit 20m', 'Sunlight 20m', 'Journal triggers'],
@@ -81,7 +81,7 @@ const weekPlan = {
   2: { // Replace
     title: 'Week 2 — Replace (effort dopamine, creation, social calibration)',
     days: [
-      ['No porn/edging all day', 'Cold exposure 90–120s', 'Deep work 90m', 'Journal at 21:00'],
+      ['No addiction/edging all day', 'Cold exposure 90–120s', 'Deep work 90m', 'Journal at 21:00'],
       ['No scrolling', 'Skill project 60m (output)', 'Heavy training / PR', 'No screens after 21:00'],
       ['Low sugar day', 'Two focus blocks (60m + 60m)', 'One difficult convo', 'Urge log 2+ entries'],
       ['Minimal music', 'Walk 20m phone-free', 'Write 300+ words', 'Sleep 7–8h'],
