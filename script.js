@@ -4,7 +4,9 @@
    - 24h board with non-free hours disabled
    - Day counters, progress bars, persistence per day
 */
-
+const hour = new Date().getHours();
+const isDay = hour >= 6 && hour < 18;
+document.body.classList.add(isDay ? 'day-theme' : 'night-theme');
 const $ = (q) => document.querySelector(q);
 const $$ = (q) => document.querySelectorAll(q);
 
