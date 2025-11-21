@@ -3,28 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Samir OS Mobile</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Samir OS">
+    <meta name="theme-color" content="#F5F5F7">
+
+    <title>Samir OS - Mobile</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
     <script src="https://unpkg.com/lucide@0.263.1"></script>
-    
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
             theme: {
                 extend: {
+                    screens: {
+                        'xs': '375px',
+                    },
                     colors: {
                         aether: {
                             bg: '#F5F5F7',
-                            glass: 'rgba(255, 255, 255, 0.85)',
+                            glass: 'rgba(255, 255, 255, 0.65)',
                             dark: '#1D1D1F',
                             muted: '#86868B',
                             accent: '#FF4F00',
@@ -37,8 +43,11 @@
                         sans: ['Inter', 'sans-serif'], 
                         display: ['Syne', 'sans-serif'] 
                     },
-                    boxShadow: {
-                        'up': '0 -4px 20px rgba(0,0,0,0.05)',
+                    animation: { 
+                        'soft-rise': 'softRise 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards'
+                    },
+                    keyframes: { 
+                        softRise: { from: { opacity: 0, transform: 'translateY(15px)' }, to: { opacity: 1, transform: 'translateY(0)' } }
                     }
                 }
             }
@@ -46,53 +55,161 @@
     </script>
 
     <style>
-        body { 
+        /* Base Mobile Styles */
+        html, body {
+            overscroll-behavior-y: none; /* Prevents pull-to-refresh feeling */
+            -webkit-tap-highlight-color: transparent;
             font-family: 'Inter', sans-serif; 
             background-color: #F5F5F7; 
-            color: #1D1D1F; 
-            -webkit-tap-highlight-color: transparent; /* Removes blue highlight on tap */
-            overscroll-behavior-y: none; /* Prevents pull-to-refresh on mobile */
+            color: #1D1D1F;
         }
 
-        /* Hide Scrollbar but allow scrolling */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* Safe Area Padding for iPhone Notch/Home Bar */
+        body {
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
 
-        /* AEROGEL CARD MOBILE */
+        /* Hide Scrollbars but allow scrolling */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Smooth Scrolling */
+        .smooth-scroll {
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* --- ANIMATIONS --- */
+        .falling-container {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .petal, .leaf-particle {
+            position: absolute;
+            top: -10%;
+            animation: fall linear infinite;
+        }
+        
+        .petal {
+            width: 15px; height: 15px;
+            background: #E8E0D5;
+            border-radius: 100% 0 100% 0;
+            opacity: 0.6;
+        }
+
+        .leaf-particle {
+            width: 12px; height: 20px;
+            background: #95C623;
+            border-radius: 0 50% 0 50%;
+            opacity: 0.5;
+        }
+
+        @keyframes fall {
+            0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.8; }
+            100% { transform: translate(50px, 110vh) rotate(720deg); opacity: 0; }
+        }
+
+        .p1 { left: 10%; animation-duration: 10s; }
+        .p2 { left: 20%; animation-duration: 14s; animation-delay: 2s; background: #F2EBE0; }
+        .p3 { left: 35%; animation-duration: 12s; animation-delay: 4s; }
+        .p4 { left: 50%; animation-duration: 18s; animation-delay: 1s; }
+        .p5 { left: 65%; animation-duration: 13s; animation-delay: 3s; background: #F8F4ED; }
+        .p6 { left: 80%; animation-duration: 16s; animation-delay: 5s; }
+        
+        /* --- AEROGEL UI (Mobile Optimized) --- */
         .aerogel-card {
             background: var(--glass);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
             border: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 4px 20px -5px rgba(0,0,0,0.05);
-            border-radius: 20px;
+            box-shadow: 0 8px 32px -8px rgba(0,0,0,0.08);
+            border-radius: 28px;
+            transition: transform 0.2s ease;
+        }
+        .aerogel-card:active { transform: scale(0.98); }
+
+        /* --- BUTTONS --- */
+        .btn-control {
+            background: white;
+            border: 1px solid #E5E5E5;
+            color: #1D1D1F;
+            padding: 8px 12px; /* Larger touch target */
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            gap: 6px;
+            font-size: 12px; font-weight: 700; text-transform: uppercase;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            touch-action: manipulation;
+        }
+        .btn-control:active {
+            background: #FF4F00; border-color: #FF4F00; color: white;
+        }
+        .btn-control.danger:active {
+            background: #FF3B30; border-color: #FF3B30; color: white;
         }
 
-        /* STICKY COLUMNS */
-        .sticky-col {
-            position: sticky;
-            left: 0;
-            background: #F5F5F7;
-            z-index: 30;
-            border-right: 1px solid rgba(0,0,0,0.05);
+        .btn-swiss { 
+            border-radius: 100px; font-weight: 600; 
+            transition: transform 0.2s; 
         }
+        .btn-swiss:active { transform: scale(0.95); }
         
-        /* BOTTOM NAV */
-        .bottom-nav-item.active { color: #1D1D1F; }
-        .bottom-nav-item.active .icon-bg { background-color: #E8E0D5; transform: scale(1.1); }
-        
-        /* PETALS */
-        .petal { position: absolute; width: 12px; height: 12px; background: #E8E0D5; border-radius: 100% 0 100% 0; animation: fall linear infinite; opacity: 0.5; }
-        @keyframes fall { 100% { transform: translate(50px, 110vh) rotate(720deg); opacity: 0; } }
+        /* Input Reset for Mobile */
+        input { font-size: 16px !important; } /* Prevents iOS zoom on focus */
     </style>
 </head>
 <body>
+    <div class="falling-container">
+        <div class="petal p1"></div>
+        <div class="petal p2"></div>
+        <div class="petal p3"></div>
+        <div class="petal p4"></div>
+        <div class="petal p5"></div>
+        <div class="petal p6"></div>
+    </div>
+
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useMemo, memo } = React;
+        const { useState, useEffect, useMemo, memo, useRef } = React;
 
-        // --- ICONS ---
+        // --- HELPERS ---
+        const HOURS = Array.from({ length: 24 }, (_, i) => i);
+        const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+        const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        
+        const TASK_LIBRARY = [{ title: "Deep Work", duration: 2 }, { title: "Meeting", duration: 1 }, { title: "Gym", duration: 1 }, { title: "Study", duration: 2 }];
+        
+        const STYLES = {
+            BTN_PRIMARY: "btn-swiss bg-aether-dark text-white active:bg-aether-accent px-6 py-4 flex items-center justify-center gap-3 shadow-xl shadow-black/5 w-full md:w-auto",
+            BTN_ACCENT: "btn-swiss bg-white text-aether-dark border border-black/5 active:border-aether-accent active:text-aether-accent shadow-sm px-5 py-3 flex items-center gap-2 text-sm",
+            INPUT_GLASS: "w-full bg-white/80 p-4 text-aether-dark border border-gray-200 rounded-2xl focus:border-aether-accent focus:outline-none font-sans text-base",
+            LABEL_SMALL: "text-[11px] uppercase font-bold text-aether-muted block mb-2 tracking-wider pl-1"
+        };
+
+        // Date Helpers
+        const toISODate = (d) => d.toISOString().split('T')[0];
+        const getStartOfWeek = (date) => {
+            const d = new Date(date);
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+            return new Date(d.setDate(diff));
+        };
+        const addDays = (date, days) => { const d = new Date(date); d.setDate(d.getDate() + days); return d; };
+        
+        // Confetti
+        const triggerConfetti = () => confetti({ particleCount: 80, spread: 100, origin: { y: 0.6 }, colors: ['#FF4F00', '#0066CC', '#E8E0D5'], disableForReducedMotion: true });
+
         const Icon = memo(({ name, size = 24, className = "" }) => {
             if (!window.lucide?.icons) return null;
             const iconName = name.split('-').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join('');
@@ -101,409 +218,461 @@
             return <span dangerouslySetInnerHTML={{ __html: svg }} className="inline-flex items-center justify-center" />;
         });
 
-        // --- HELPERS ---
-        const HOURS = Array.from({ length: 24 }, (_, i) => i);
-        const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-        const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        const toISODate = (d) => d.toISOString().split('T')[0];
-        const getStartOfWeek = (d) => { const date = new Date(d); const day = date.getDay(); const diff = date.getDate() - day + (day === 0 ? -6 : 1); return new Date(date.setDate(diff)); };
-        const addDays = (d, days) => { const date = new Date(d); date.setDate(date.getDate() + days); return date; };
-
-        // --- 1. BOTTOM NAVIGATION (MOBILE DOCK) ---
-        const MobileNav = ({ view, setView }) => {
+        // --- 1. MOBILE DOCK ---
+        const CommandDock = ({ view, setView }) => {
             const items = [
                 { id: 'home', icon: 'layout-grid', label: 'Home' },
                 { id: 'week', icon: 'calendar', label: 'Plan' },
                 { id: 'day', icon: 'zap', label: 'Focus' },
-                { id: 'projects', icon: 'layers', label: 'Work' },
+                { id: 'projects', icon: 'layers', label: 'Projs' },
             ];
 
             return (
-                <div className="fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-xl border-t border-gray-200 pb-safe z-50 shadow-up">
-                    <div className="flex justify-around items-center h-16 pb-1">
-                        {items.map(item => (
-                            <button key={item.id} onClick={() => setView(item.id)} className={`bottom-nav-item flex flex-col items-center justify-center w-full h-full gap-1 transition-all text-gray-400 ${view === item.id ? 'active' : ''}`}>
-                                <div className="icon-bg p-1.5 rounded-xl transition-all duration-300">
-                                    <Icon name={item.icon} size={22} strokeWidth={2.5} />
-                                </div>
-                                <span className="text-[10px] font-bold uppercase tracking-wide">{item.label}</span>
-                            </button>
-                        ))}
+                <div className="fixed bottom-6 left-0 w-full z-[100] px-4 pb-[env(safe-area-inset-bottom)]">
+                    <div className="bg-white/90 backdrop-blur-2xl border border-white/50 p-2 rounded-[24px] shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] flex justify-between max-w-md mx-auto">
+                        {items.map(item => {
+                            const isActive = view === item.id;
+                            return (
+                                <button 
+                                    key={item.id} 
+                                    onClick={() => setView(item.id)} 
+                                    className={`
+                                        flex flex-col items-center justify-center flex-1 py-3 rounded-2xl transition-all duration-200
+                                        ${isActive ? 'bg-aether-dark text-white shadow-lg scale-105' : 'text-aether-muted active:bg-gray-100'}
+                                    `}
+                                >
+                                    <Icon name={item.icon} size={22} strokeWidth={isActive ? 2.5 : 2} />
+                                    {isActive && <div className="w-1 h-1 bg-aether-accent rounded-full mt-1"></div>}
+                                </button>
+                            )
+                        })}
                     </div>
                 </div>
             );
         };
 
-        // --- 2. HOME VIEW ---
+        // --- 2. HOME VIEW (Mobile Stacked) ---
         const HomeView = ({ xp, stats, now }) => {
             const level = Math.floor(xp / 100) + 1;
+            const progress = xp % 100; 
+            const circumference = 2 * Math.PI * 40;
+            const offset = circumference - (progress / 100) * circumference;
+
             return (
-                <div className="p-6 pb-32 space-y-6 animate-soft-rise">
-                    {/* HEADER / CLOCK */}
-                    <div className="flex justify-between items-center mt-4">
-                        <div>
-                            <h1 className="font-display font-bold text-4xl text-aether-dark">Samir OS</h1>
-                            <div className="text-xs font-bold text-aether-muted uppercase tracking-wider mt-1">{now.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}</div>
-                        </div>
-                        <div className="text-right">
-                            <div className="font-display font-bold text-4xl text-aether-dark tracking-tight">
-                                {now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* LEVEL CARD */}
-                    <div className="aerogel-card p-6 flex items-center gap-4">
-                        <div className="relative w-16 h-16">
-                            <svg className="w-full h-full transform -rotate-90"><circle className="stroke-gray-200 fill-none" cx="32" cy="32" r="28" strokeWidth="4" /><circle className="stroke-aether-accent fill-none" cx="32" cy="32" r="28" strokeWidth="4" strokeDasharray={2*Math.PI*28} strokeDashoffset={2*Math.PI*28 * (1 - (xp % 100)/100)} strokeLinecap="round" /></svg>
-                            <div className="absolute inset-0 flex items-center justify-center font-bold text-aether-dark">Lvl {level}</div>
-                        </div>
-                        <div>
-                            <div className="text-sm font-bold text-aether-muted uppercase">Current Status</div>
-                            <div className="font-bold text-xl text-aether-dark">System Online</div>
-                        </div>
-                    </div>
-
-                    {/* CURRENT TASK */}
-                    <div className="aerogel-card p-6 bg-white relative overflow-hidden">
-                        <div className="absolute -right-10 -top-10 w-40 h-40 bg-aether-sand/40 rounded-full blur-2xl"></div>
-                        <div className="relative z-10">
-                            <div className="flex items-center gap-2 mb-4 text-aether-accent">
-                                <Icon name="radio" size={16} className="animate-pulse"/>
-                                <span className="text-xs font-bold uppercase tracking-widest">Now Active</span>
-                            </div>
-                            <h2 className="font-display font-bold text-3xl text-aether-dark mb-2 leading-tight">{stats.currentTask ? stats.currentTask.title : "Free Time"}</h2>
-                            <p className="text-gray-500 text-sm leading-relaxed mb-6">
-                                {stats.currentTask ? `Scheduled until ${stats.currentTask.startHour + stats.currentTask.duration}:00.` : "No specific directives. Relax or plan ahead."}
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* UP NEXT LIST */}
-                    <div className="aerogel-card p-6">
-                        <div className="flex justify-between items-center mb-4">
-                            <span className="text-xs font-bold text-aether-muted uppercase tracking-wider">Up Next</span>
-                            <span className="bg-gray-100 text-gray-600 text-xs font-bold px-2 py-1 rounded-md">{stats.tasksLeft} Pending</span>
-                        </div>
-                        <div className="space-y-3">
-                            {stats.upcomingTodos.map(t => (
-                                <div key={t.id} className="flex items-center gap-3 p-3 bg-white/50 border border-white rounded-xl shadow-sm">
-                                    <div className="w-2 h-2 rounded-full bg-aether-secondary"></div>
-                                    <span className="text-sm font-medium text-aether-dark truncate">{t.text}</span>
+                <div className="pt-6 pb-32 px-5 animate-soft-rise max-w-md mx-auto md:max-w-4xl">
+                    {/* Header Section */}
+                    <div className="flex flex-col gap-6 mb-10">
+                        <div className="flex items-center justify-between">
+                            <div className="relative w-20 h-20">
+                                <svg className="w-full h-full transform -rotate-90 drop-shadow-md">
+                                    <circle className="stroke-white/60 fill-none" cx="40" cy="40" r="36" strokeWidth="4" />
+                                    <circle className="stroke-aether-accent fill-none transition-all duration-1000" cx="40" cy="40" r="36" strokeWidth="4" strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" />
+                                </svg>
+                                <div className="absolute inset-2 rounded-full overflow-hidden border-2 border-white shadow-sm bg-gray-200">
+                                    <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=200&q=80" className="w-full h-full object-cover filter sepia-[.25]" />
                                 </div>
-                            ))}
-                            {stats.upcomingTodos.length === 0 && <div className="text-center text-sm text-gray-400 py-2">All caught up!</div>}
+                                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-white text-aether-dark shadow-md text-[9px] font-bold px-2 py-0.5 rounded-full border border-gray-100">Lvl {level}</div>
+                            </div>
+                            <div className="text-right">
+                                <div className="font-display font-bold text-6xl text-aether-dark tracking-tighter leading-none">
+                                    {now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                </div>
+                                <div className="text-aether-secondary font-bold text-xs mt-1 uppercase tracking-widest">
+                                    {now.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h1 className="font-display font-bold text-4xl text-aether-dark mb-1 tracking-tight">Samir OS</h1>
+                             <div className="flex items-center gap-2 text-aether-muted font-medium text-sm">
+                                <span className="w-2 h-2 rounded-full bg-aether-leaf animate-pulse"></span>
+                                <span>System Online</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Dashboard Grid */}
+                    <div className="flex flex-col gap-5">
+                        {/* Current Task Card */}
+                        <div className="aerogel-card p-6 relative overflow-hidden">
+                            <div className="absolute -right-10 -top-10 w-40 h-40 bg-aether-sand/40 rounded-full blur-2xl"></div>
+                            <div className="relative z-10">
+                                <div className="flex items-center gap-2 mb-4">
+                                    <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center shadow-sm text-aether-accent"><Icon name="radio" size={12} /></div>
+                                    <span className="text-aether-muted text-[10px] font-bold uppercase tracking-widest">Directives</span>
+                                </div>
+                                <h2 className="font-display font-bold text-3xl text-aether-dark mb-2 leading-tight">{stats.currentTask ? stats.currentTask.title : "Leisure Time"}</h2>
+                                <p className="text-aether-muted text-sm mb-6 font-medium">
+                                    {stats.currentTask ? `Ends at ${stats.currentTask.startHour + stats.currentTask.duration}:00.` : "No active tasks."}
+                                </p>
+                                <button className={STYLES.BTN_PRIMARY}>
+                                    Details <Icon name="arrow-right" size={16}/>
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Stats Row */}
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="aerogel-card p-5 flex flex-col justify-between h-32">
+                                <div className="text-4xl font-display font-bold text-aether-dark">{stats.tasksLeft}</div>
+                                <div className="text-aether-muted text-[10px] font-bold uppercase tracking-wider">Pending</div>
+                            </div>
+                             <div className="aerogel-card p-5 flex flex-col justify-between h-32 items-end">
+                                <div className="w-10 h-10 rounded-xl bg-aether-secondary/10 text-aether-secondary flex items-center justify-center"><Icon name="layers" size={20} /></div>
+                                <div className="text-aether-muted text-[10px] font-bold uppercase tracking-wider text-right">Tasks</div>
+                            </div>
+                        </div>
+
+                        {/* Up Next */}
+                        <div className="aerogel-card p-6">
+                            <div className="text-aether-muted text-[10px] font-bold uppercase tracking-wider mb-4 flex items-center gap-2"><Icon name="list" size={12}/> Up Next</div>
+                            <ul className="space-y-3">
+                                {stats.upcomingTodos.map(t => (
+                                    <li key={t.id} className="flex items-center gap-3 text-aether-dark">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-aether-accent flex-shrink-0"></div>
+                                        <span className="font-medium text-sm truncate">{t.text}</span>
+                                    </li>
+                                ))}
+                                {stats.upcomingTodos.length === 0 && <li className="text-aether-muted italic text-sm">All clear.</li>}
+                            </ul>
                         </div>
                     </div>
                 </div>
             );
         };
 
-        // --- 3. PLANNER VIEW (MOBILE) ---
-        const PlannerView = ({ schedule, setSchedule, now }) => {
+        // --- 3. WEEKLY PLANNER (Mobile Scroll) ---
+        const WeeklyPlanner = ({ schedule, setSchedule, now }) => {
+            const [viewMode, setViewMode] = useState('week'); 
             const [focusDate, setFocusDate] = useState(new Date(now));
-            const [modalOpen, setModalOpen] = useState(false);
-            const [editData, setEditData] = useState(null); // { id, title, day, hour, duration }
+            const [editTask, setEditTask] = useState(null);
+            
+            const navigate = (direction) => {
+                const d = new Date(focusDate);
+                if (viewMode === 'week') d.setDate(d.getDate() + (direction * 7));
+                else if (viewMode === 'month') d.setMonth(d.getMonth() + direction);
+                setFocusDate(d);
+            };
 
-            const startOfWk = getStartOfWeek(focusDate);
-            const weekDates = Array.from({length: 7}, (_, i) => addDays(startOfWk, i));
-
-            const navigate = (dir) => { const d = new Date(focusDate); d.setDate(d.getDate() + (dir * 7)); setFocusDate(d); };
-            const goToToday = () => setFocusDate(new Date());
-
-            // "Tap to Schedule" Logic
-            const handleSlotTap = (dateStr, hour) => {
-                // Check if task exists
-                const existing = schedule.find(t => t.date === dateStr && hour >= t.startHour && hour < t.startHour + t.duration);
-                if (existing) {
-                    setEditData(existing);
-                } else {
-                    setEditData({ id: null, title: "", date: dateStr, startHour: hour, duration: 1 });
+            // For mobile, simpler interaction: Tap empty slot to add, Tap task to edit
+            const handleSlotClick = (dateStr, hour) => {
+                // Add a default task
+                const title = prompt("New Task Title:");
+                if(title) {
+                    setSchedule([...schedule, {
+                        id: Date.now().toString(),
+                        title, duration: 1, date: dateStr, startHour: hour
+                    }]);
                 }
-                setModalOpen(true);
             };
 
-            const saveTask = () => {
-                if (!editData.title.trim()) return;
-                if (editData.id) {
-                    // Update
-                    setSchedule(schedule.map(t => t.id === editData.id ? editData : t));
-                } else {
-                    // Create
-                    setSchedule([...schedule, { ...editData, id: Date.now().toString() }]);
-                }
-                setModalOpen(false);
-            };
+            const deleteTask = () => { setSchedule(schedule.filter(t => t.id !== editTask.id)); setEditTask(null); };
+            const saveEdit = () => { setSchedule(schedule.map(t => t.id === editTask.id ? editTask : t)); setEditTask(null); };
 
-            const deleteTask = () => {
-                if(editData.id) setSchedule(schedule.filter(t => t.id !== editData.id));
-                setModalOpen(false);
-            };
-
-            return (
-                <div className="h-screen flex flex-col bg-aether-bg pb-20">
-                    {/* NAV HEADER */}
-                    <div className="px-4 py-3 bg-white/90 backdrop-blur-md border-b border-gray-200 sticky top-0 z-40 flex justify-between items-center shadow-sm">
-                        <div className="flex gap-2">
-                             {/* BLACK SQUARE BUTTONS WITH WHITE ARROWS */}
-                            <button onClick={() => navigate(-1)} className="w-10 h-10 bg-[#1D1D1F] rounded-lg flex items-center justify-center text-white shadow-md active:scale-95 transition-transform">
-                                <Icon name="arrow-left" size={20} strokeWidth={3} />
-                            </button>
-                            <button onClick={() => navigate(1)} className="w-10 h-10 bg-[#1D1D1F] rounded-lg flex items-center justify-center text-white shadow-md active:scale-95 transition-transform">
-                                <Icon name="arrow-right" size={20} strokeWidth={3} />
-                            </button>
+            const MonthView = () => {
+                const year = focusDate.getFullYear();
+                const month = focusDate.getMonth();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const firstDay = new Date(year, month, 1);
+                const startDayIdx = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1; 
+                const blanks = Array(startDayIdx).fill(null);
+                const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+                
+                return (
+                    <div className="p-4 animate-soft-rise">
+                        <div className="grid grid-cols-7 mb-2">
+                            {DAYS.map(d => <div key={d} className="text-center text-[10px] font-bold uppercase text-aether-muted">{d.charAt(0)}</div>)}
                         </div>
-                        <div className="text-center">
-                            <div className="text-[10px] font-bold uppercase text-gray-400 tracking-widest">Current Week</div>
-                            <div className="text-sm font-bold text-aether-dark">{MONTHS[focusDate.getMonth()]} {focusDate.getFullYear()}</div>
-                        </div>
-                        <button onClick={goToToday} className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-aether-dark font-bold text-xs active:bg-gray-200">
-                            TDY
-                        </button>
-                    </div>
-
-                    {/* SCROLLABLE GRID */}
-                    <div className="flex-1 overflow-auto no-scrollbar relative bg-white">
-                        <div className="flex min-w-[120vw]"> 
-                            {/* TIME COLUMN (STICKY) */}
-                            <div className="sticky-col w-14 pt-12 flex-shrink-0 z-30 bg-[#F9FAFB]">
-                                {HOURS.map(h => (
-                                    <div key={h} className="h-16 text-[10px] font-bold text-gray-400 flex items-start justify-center pt-1 border-b border-gray-100">
-                                        {h}:00
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* DAYS COLUMNS */}
-                            {weekDates.map((date, i) => {
-                                const dateStr = toISODate(date);
-                                const isToday = dateStr === toISODate(now);
-                                const dayTasks = schedule.filter(t => t.date === dateStr);
-
+                        <div className="grid grid-cols-7 gap-2">
+                            {blanks.map((_, i) => <div key={`b-${i}`}></div>)}
+                            {days.map(d => {
+                                const dateStr = toISODate(new Date(year, month, d));
+                                const isToday = dateStr === toISODate(new Date());
+                                const hasTask = schedule.some(t => t.date === dateStr);
                                 return (
-                                    <div key={i} className="flex-1 min-w-[100px] border-r border-gray-100 relative">
-                                        {/* DAY HEADER */}
-                                        <div className={`h-12 flex flex-col items-center justify-center border-b sticky top-0 z-20 ${isToday ? 'bg-aether-accent text-white shadow-md' : 'bg-white text-gray-500'}`}>
-                                            <span className="text-[9px] font-bold uppercase">{DAYS[i]}</span>
-                                            <span className="text-base font-bold leading-none">{date.getDate()}</span>
-                                        </div>
-
-                                        {/* GRID CELLS */}
-                                        <div className="relative bg-white">
-                                            {HOURS.map(h => (
-                                                <div key={h} onClick={() => handleSlotTap(dateStr, h)} className="h-16 border-b border-gray-50 active:bg-blue-50 transition-colors"></div>
-                                            ))}
-
-                                            {/* TASKS */}
-                                            {dayTasks.map(task => (
-                                                <div key={task.id} onClick={(e) => { e.stopPropagation(); handleSlotTap(dateStr, task.startHour); }}
-                                                    className="absolute inset-x-1 rounded-lg bg-[#1D1D1F] text-white p-2 shadow-md flex flex-col justify-center overflow-hidden border-l-2 border-aether-accent active:scale-95 transition-transform z-10"
-                                                    style={{ top: `${task.startHour * 64 + 2}px`, height: `${task.duration * 64 - 4}px` }}
-                                                >
-                                                    <div className="font-bold text-xs leading-tight truncate">{task.title}</div>
-                                                    <div className="text-[9px] opacity-70">{task.duration}h</div>
-                                                </div>
-                                            ))}
-                                            
-                                            {/* CURRENT TIME LINE */}
-                                            {isToday && <div className="absolute w-full border-t-2 border-red-500 z-20 pointer-events-none flex items-center" style={{ top: `${(now.getHours() * 64) + (now.getMinutes() * (64/60))}px` }}>
-                                                <div className="w-2 h-2 bg-red-500 rounded-full -ml-1"></div>
-                                            </div>}
-                                        </div>
+                                    <div key={d} onClick={() => { setFocusDate(new Date(year, month, d)); setViewMode('week'); }} 
+                                         className={`aspect-square rounded-xl border flex flex-col items-center justify-center text-sm font-bold cursor-pointer relative
+                                         ${isToday ? 'bg-aether-dark text-white border-transparent' : 'bg-white border-gray-100 text-aether-dark'}`}>
+                                        {d}
+                                        {hasTask && !isToday && <div className="w-1 h-1 bg-aether-accent rounded-full mt-1"></div>}
                                     </div>
                                 )
                             })}
                         </div>
                     </div>
+                );
+            };
 
-                    {/* ADD/EDIT MODAL */}
-                    {modalOpen && (
-                        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
-                            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setModalOpen(false)}></div>
-                            <div className="bg-white w-full sm:w-auto sm:max-w-sm rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl relative z-10 animate-soft-rise">
-                                <div className="w-12 h-1 bg-gray-200 rounded-full mx-auto mb-6"></div>
-                                <h3 className="text-xl font-display font-bold mb-6 text-aether-dark">{editData.id ? 'Edit Task' : 'New Task'}</h3>
-                                
-                                <div className="space-y-4 mb-8">
-                                    <div>
-                                        <label className="text-xs font-bold text-gray-400 uppercase ml-1">Title</label>
-                                        <input value={editData.title} onChange={e => setEditData({...editData, title: e.target.value})} className="w-full p-4 bg-gray-50 rounded-2xl font-bold text-lg border-transparent focus:bg-white focus:border-aether-accent border-2 outline-none transition-colors" placeholder="Task Name..." autoFocus />
-                                    </div>
-                                    <div className="flex gap-4">
-                                        <div className="flex-1">
-                                            <label className="text-xs font-bold text-gray-400 uppercase ml-1">Start Time</label>
-                                            <select value={editData.startHour} onChange={e => setEditData({...editData, startHour: parseInt(e.target.value)})} className="w-full p-4 bg-gray-50 rounded-2xl font-bold appearance-none">
-                                                {HOURS.map(h => <option key={h} value={h}>{h}:00</option>)}
-                                            </select>
+            const WeekView = () => {
+                const startOfWk = getStartOfWeek(focusDate);
+                const weekDates = Array.from({length: 7}, (_, i) => addDays(startOfWk, i));
+                
+                return (
+                    <div className="flex-1 overflow-auto relative z-10 smooth-scroll no-scrollbar animate-soft-rise">
+                        {/* Mobile Grid: Fixed Time Column, Scrollable Days */}
+                        <div className="flex min-w-max">
+                            {/* Time Column */}
+                            <div className="sticky left-0 z-30 bg-white/90 backdrop-blur border-r border-gray-100 w-12 pt-14">
+                                {HOURS.map(h => <div key={h} className="h-16 border-b border-gray-50 text-[9px] font-bold text-aether-muted text-center pt-2">{h}</div>)}
+                            </div>
+                            
+                            {/* Days Columns */}
+                            <div className="flex">
+                                {weekDates.map((date, dayIdx) => {
+                                    const isToday = toISODate(date) === toISODate(new Date());
+                                    const dateStr = toISODate(date);
+                                    const dayTasks = schedule.filter(t => t.date === dateStr);
+                                    return (
+                                        <div key={dateStr} className={`border-r border-gray-100 relative w-24 xs:w-32 ${isToday ? 'bg-white/50' : ''}`}>
+                                            <div className={`h-14 border-b border-gray-100 sticky top-0 z-20 flex flex-col items-center justify-center ${isToday ? 'bg-aether-accent text-white shadow-md' : 'bg-white/80 text-aether-muted'}`}>
+                                                <span className="text-[9px] font-bold uppercase tracking-widest">{DAYS[dayIdx]}</span>
+                                                <span className="text-lg font-display font-bold leading-none">{date.getDate()}</span>
+                                            </div>
+                                            <div className="relative">
+                                                {HOURS.map(h => (
+                                                    <div key={h} 
+                                                        className="h-16 border-b border-white/40 active:bg-black/5" 
+                                                        onClick={() => handleSlotClick(dateStr, h)}
+                                                    ></div>
+                                                ))}
+                                                {dayTasks.map(task => (
+                                                    <div key={task.id} onClick={(e) => { e.stopPropagation(); setEditTask(task); }} 
+                                                        className="absolute inset-x-1 p-2 rounded-lg bg-aether-dark text-white shadow-md z-10 flex flex-col justify-center overflow-hidden border border-white/10 active:scale-95 transition-transform" 
+                                                        style={{top: `${task.startHour * 64 + 2}px`, height: `${task.duration * 64 - 4}px`}}>
+                                                        <div className="font-bold text-[10px] leading-tight">{task.title}</div>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
-                                        <div className="flex-1">
-                                            <label className="text-xs font-bold text-gray-400 uppercase ml-1">Duration (h)</label>
-                                            <input type="number" min="1" max="8" value={editData.duration} onChange={e => setEditData({...editData, duration: parseInt(e.target.value)})} className="w-full p-4 bg-gray-50 rounded-2xl font-bold text-center" />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="flex gap-3">
-                                    {editData.id && (
-                                        <button onClick={deleteTask} className="p-4 rounded-2xl bg-red-50 text-red-500 font-bold border border-red-100 hover:bg-red-100">
-                                            <Icon name="trash" size={20} />
-                                        </button>
-                                    )}
-                                    <button onClick={() => setModalOpen(false)} className="flex-1 py-4 rounded-2xl font-bold text-gray-500 bg-gray-100">Cancel</button>
-                                    <button onClick={saveTask} className="flex-[2] py-4 rounded-2xl font-bold text-white bg-aether-dark shadow-lg shadow-gray-300">Save</button>
-                                </div>
+                                    )
+                                })}
                             </div>
                         </div>
-                    )}
+                    </div>
+                );
+            };
+
+            // EDIT MODAL
+            const editModal = editTask ? (
+                <div className="fixed inset-0 z-[200] flex items-center justify-center px-4">
+                    <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setEditTask(null)}></div>
+                    <div className="bg-white p-6 rounded-[32px] w-full max-w-sm shadow-2xl relative z-10 animate-soft-rise">
+                        <h3 className="font-display font-bold text-2xl mb-4 text-aether-dark">Edit Event</h3>
+                        <div className="space-y-4">
+                            <div><label className={STYLES.LABEL_SMALL}>Title</label><input value={editTask.title} onChange={e => setEditTask({...editTask, title: e.target.value})} className={STYLES.INPUT_GLASS}/></div>
+                            <div className="flex gap-4">
+                                <div className="flex-1"><label className={STYLES.LABEL_SMALL}>Start (24h)</label><input type="number" min="0" max="23" value={editTask.startHour} onChange={e=>setEditTask({...editTask, startHour:parseInt(e.target.value)})} className={STYLES.INPUT_GLASS}/></div>
+                                <div className="flex-1"><label className={STYLES.LABEL_SMALL}>Hours</label><input type="number" min="1" max="12" value={editTask.duration} onChange={e=>setEditTask({...editTask, duration:parseInt(e.target.value)})} className={STYLES.INPUT_GLASS}/></div>
+                            </div>
+                        </div>
+                        <div className="flex gap-3 mt-6">
+                            <button onClick={deleteTask} className="btn-control danger flex-1 py-3 text-red-500 border-red-200">Delete</button> 
+                            <button onClick={saveEdit} className="flex-[2] bg-aether-dark text-white rounded-xl font-bold shadow-lg active:bg-aether-accent transition-all text-sm">Save</button>
+                        </div>
+                    </div>
+                </div>
+            ) : null;
+
+            return (
+                <div className="h-screen flex flex-col pb-32 bg-white/30">
+                    {/* NAV BAR */}
+                    <div className="px-4 py-3 bg-white/80 backdrop-blur-xl sticky top-0 z-40 flex justify-between items-center border-b border-gray-200">
+                        <div className="flex gap-2">
+                            <button onClick={() => navigate(-1)} className="w-9 h-9 bg-aether-dark rounded-full text-white flex items-center justify-center active:scale-90 transition-transform"><Icon name="chevron-left" size={18}/></button>
+                            <button onClick={() => navigate(1)} className="w-9 h-9 bg-aether-dark rounded-full text-white flex items-center justify-center active:scale-90 transition-transform"><Icon name="chevron-right" size={18}/></button>
+                        </div>
+                        <div className="font-bold text-sm text-aether-dark">{MONTHS[focusDate.getMonth()]} {focusDate.getFullYear()}</div>
+                        <div className="bg-gray-200 rounded-lg p-0.5 flex text-[10px] font-bold">
+                            <button onClick={() => setViewMode('week')} className={`px-3 py-1.5 rounded-md ${viewMode === 'week' ? 'bg-white shadow-sm' : 'text-gray-500'}`}>WK</button>
+                            <button onClick={() => setViewMode('month')} className={`px-3 py-1.5 rounded-md ${viewMode === 'month' ? 'bg-white shadow-sm' : 'text-gray-500'}`}>MO</button>
+                        </div>
+                    </div>
+
+                    {viewMode === 'month' && <MonthView />}
+                    {viewMode === 'week' && <WeekView />}
+                    {editTask && ReactDOM.createPortal(editModal, document.body)}
                 </div>
             );
         };
 
-        // --- 4. FOCUS / DAY VIEW ---
-        const FocusView = ({ todos, setTodos }) => {
-            const [timer, setTimer] = useState(25*60);
-            const [active, setActive] = useState(false);
-            const [input, setInput] = useState("");
+        // --- 4. DAY VIEW (Mobile) ---
+        const DayView = ({ schedule, todos, toggleTodo, gainXp, now, setTodos }) => {
+            const currentHour = now.getHours();
+            const todayStr = toISODate(now);
+            const sortedSchedule = useMemo(() => schedule.filter(t => t.date === todayStr).sort((a,b) => a.startHour - b.startHour), [schedule, todayStr]);
+            const [timeLeft, setTimeLeft] = useState(25 * 60);
+            const [isActive, setIsActive] = useState(false);
+            const [newTodo, setNewTodo] = useState("");
 
-            useEffect(() => {
-                let int = null;
-                if (active && timer > 0) int = setInterval(() => setTimer(t => t-1), 1000);
-                return () => clearInterval(int);
-            }, [active, timer]);
+            useEffect(() => { 
+                let interval = null;
+                if (isActive && timeLeft > 0) interval = setInterval(() => setTimeLeft(t => t - 1), 1000);
+                else if (timeLeft === 0 && isActive) { setIsActive(false); gainXp(50); alert("Focus Complete"); }
+                return () => clearInterval(interval); 
+            }, [isActive, timeLeft]);
 
-            const fmt = (s) => `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`;
-            const addTodo = () => { if(input.trim()){ setTodos([...todos, {id:Date.now(), text:input, done:false}]); setInput(""); } };
-
+            const addTodo = () => { if(newTodo.trim()) { setTodos([...todos, {id: Date.now(), text: newTodo, done: false}]); setNewTodo(""); }};
+            
             return (
-                <div className="p-6 pb-32 space-y-8 animate-soft-rise">
-                    {/* TIMER CARD */}
-                    <div className="aerogel-card p-8 text-center relative overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-b from-white/50 to-transparent pointer-events-none"></div>
-                        <div className="relative z-10">
-                            <div className="text-xs font-bold uppercase text-aether-muted tracking-[0.3em] mb-6">Session Timer</div>
-                            <div className="text-8xl font-display font-bold text-aether-dark mb-8 tracking-tighter">{fmt(timer)}</div>
-                            <div className="flex justify-center gap-4">
-                                <button onClick={() => setActive(!active)} className={`w-16 h-16 rounded-full flex items-center justify-center text-white shadow-lg transition-transform active:scale-95 ${active ? 'bg-aether-accent' : 'bg-aether-dark'}`}>
-                                    <Icon name={active ? "pause" : "play"} size={28} fill="currentColor" />
-                                </button>
-                                <button onClick={() => {setActive(false); setTimer(25*60)}} className="w-16 h-16 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center active:bg-gray-200">
-                                    <Icon name="rotate-ccw" size={24} />
-                                </button>
-                            </div>
+                <div className="pt-4 pb-32 px-4 animate-soft-rise max-w-md mx-auto">
+                    {/* Timer Card */}
+                    <div className="aerogel-card rounded-3xl p-8 mb-6 text-center relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-aether-secondary via-aether-accent to-aether-secondary opacity-50"></div>
+                        <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-aether-muted mb-4">Focus Session</div>
+                        <div className="font-display font-bold text-7xl text-aether-dark tabular-nums tracking-tighter mb-6">
+                            {Math.floor(timeLeft/60).toString().padStart(2,'0')}<span className="text-gray-300">:</span>{(timeLeft%60).toString().padStart(2,'0')}
+                        </div>
+                        <div className="flex items-center justify-center gap-6">
+                            <button onClick={() => setIsActive(!isActive)} className={`w-16 h-16 rounded-full flex items-center justify-center text-white shadow-xl transition-all active:scale-95 ${isActive ? 'bg-aether-accent' : 'bg-aether-dark'}`}>
+                                <Icon name={isActive ? "pause" : "play"} size={28} fill="currentColor" />
+                            </button>
+                            <button onClick={() => {setIsActive(false); setTimeLeft(25 * 60);}} className="w-12 h-12 rounded-full bg-white text-aether-dark border border-gray-200 flex items-center justify-center active:bg-gray-100"><Icon name="rotate-ccw" size={20} /></button>
                         </div>
                     </div>
 
-                    {/* TODO LIST */}
-                    <div>
-                        <h3 className="font-display font-bold text-2xl mb-4 ml-1">Tasks</h3>
-                        <div className="flex gap-2 mb-4">
-                            <input value={input} onChange={e=>setInput(e.target.value)} className="flex-1 p-4 rounded-2xl bg-white border border-gray-200 shadow-sm outline-none focus:border-aether-accent" placeholder="Add a new task..." />
-                            <button onClick={addTodo} className="w-14 rounded-2xl bg-aether-dark text-white flex items-center justify-center shadow-md"><Icon name="plus" size={24} /></button>
+                    <div className="flex flex-col gap-6">
+                        {/* Timeline */}
+                        <div className="aerogel-card p-6">
+                            <h3 className="font-display font-bold text-xl mb-4 text-aether-dark">Today's Schedule</h3>
+                            <div className="space-y-4">
+                                {sortedSchedule.map(t => {
+                                    const isPast = currentHour >= t.startHour + t.duration;
+                                    const isNow = currentHour >= t.startHour && currentHour < t.startHour + t.duration;
+                                    return (
+                                        <div key={t.id} className={`flex gap-3 items-center ${isPast ? 'opacity-40' : ''}`}>
+                                            <div className="text-[10px] font-bold text-aether-muted w-8 text-right pt-1">{t.startHour}:00</div>
+                                            <div className={`flex-1 p-3 rounded-xl border transition-all ${isNow ? 'bg-aether-dark text-white shadow-lg' : 'bg-white/50 border-gray-100 text-aether-dark'}`}>
+                                                <div className="font-bold text-sm">{t.title}</div>
+                                                <div className="text-[10px] opacity-70 uppercase tracking-wider">{t.duration}h</div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                                {sortedSchedule.length === 0 && <div className="text-sm text-aether-muted italic">No scheduled events.</div>}
+                            </div>
                         </div>
-                        <div className="space-y-3">
-                            {todos.map(t => (
-                                <div key={t.id} onClick={() => setTodos(todos.map(x => x.id === t.id ? {...x, done: !x.done} : x))}
-                                    className={`p-4 rounded-2xl border flex items-center gap-4 transition-all active:scale-[0.98] ${t.done ? 'bg-transparent border-transparent opacity-50' : 'bg-white border-gray-100 shadow-sm'}`}
-                                >
-                                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${t.done ? 'bg-aether-secondary border-aether-secondary text-white' : 'border-gray-300'}`}>
-                                        {t.done && <Icon name="check" size={14} strokeWidth={4} />}
+
+                        {/* Tasks */}
+                        <div className="aerogel-card p-6">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="font-display font-bold text-xl text-aether-dark">Tasks</h3>
+                                {todos.length > 0 && <button onClick={()=>confirm("Clear?") && setTodos([])} className="text-red-500 text-[10px] font-bold uppercase bg-red-50 px-2 py-1 rounded">Clear</button>}
+                            </div>
+                            
+                            <div className="flex gap-2 mb-4">
+                                <input type="text" value={newTodo} onChange={(e) => setNewTodo(e.target.value)} placeholder="New task..." className="flex-1 bg-white border border-gray-200 rounded-xl px-3 py-3 text-sm outline-none"/>
+                                <button onClick={addTodo} className="bg-aether-dark text-white w-12 rounded-xl flex items-center justify-center active:bg-aether-accent"><Icon name="plus" size={20}/></button>
+                            </div>
+
+                            <div className="space-y-2">
+                                {todos.map(t => (
+                                    <div key={t.id} onClick={() => { toggleTodo(t.id); if(!t.done) gainXp(10); }} className={`flex items-center gap-3 p-3 rounded-xl active:scale-[0.99] transition-transform ${t.done ? 'opacity-40 bg-transparent' : 'bg-white border border-gray-100'}`}>
+                                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${t.done ? 'bg-aether-dark border-aether-dark text-white' : 'border-gray-300'}`}>
+                                            {t.done && <Icon name="check" size={12} />}
+                                        </div>
+                                        <span className={`flex-1 text-sm font-medium ${t.done ? 'line-through' : ''}`}>{t.text}</span>
+                                        <button onClick={(e) => { e.stopPropagation(); setTodos(todos.filter(x => x.id !== t.id)); }} className="text-gray-400 p-2"><Icon name="x" size={14}/></button>
                                     </div>
-                                    <span className={`flex-1 font-medium text-lg ${t.done ? 'line-through' : ''}`}>{t.text}</span>
-                                    
-                                    {/* VISIBLE RED DELETE BUTTON */}
-                                    <button onClick={(e) => { e.stopPropagation(); setTodos(todos.filter(x => x.id !== t.id)); }} className="w-10 h-10 flex items-center justify-center rounded-xl border-2 border-red-100 bg-red-50 text-red-500 active:bg-red-500 active:text-white active:border-red-500 transition-colors">
-                                        <Icon name="trash-2" size={18} />
-                                    </button>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
             );
         };
 
-        // --- 5. PROJECTS VIEW ---
-        const ProjectsView = ({ projects, setProjects }) => {
-            const [newProj, setNewProj] = useState("");
-            const addProj = () => { if(newProj) { setProjects([...projects, {id:Date.now(), title:newProj, progress:0}]); setNewProj(""); } };
-
+        // --- 5. PROJECTS VIEW (Mobile) ---
+        const ProjectsView = ({ projects, setProjects, gainXp }) => {
+            const updateProject = (pid, fn) => setProjects(projects.map(p => p.id === pid ? fn(p) : p));
+            const toggleMilestone = (pid, mid) => updateProject(pid, p => {
+                const newMs = p.milestones.map(m => m.id === mid ? { ...m, done: !m.done } : m);
+                if (newMs.find(m => m.id === mid).done && !p.milestones.find(m => m.id === mid).done) { gainXp(25); triggerConfetti(); }
+                return { ...p, milestones: newMs, progress: newMs.length ? Math.round((newMs.filter(m=>m.done).length / newMs.length) * 100) : 0 };
+            });
+            const addMilestone = (pid) => { const m = prompt("Milestone Name:"); if(m) updateProject(pid, p => { const nM = [...p.milestones, {id:Date.now(), text:m, done:false}]; return {...p, milestones: nM, progress: Math.round((nM.filter(x=>x.done).length/nM.length)*100)};}); };
+            
             return (
-                <div className="p-6 pb-32 space-y-6 animate-soft-rise">
-                     <h1 className="font-display font-bold text-4xl mt-4 mb-6">Projects</h1>
-                     
-                     <div className="flex gap-2 mb-8">
-                        <input value={newProj} onChange={e=>setNewProj(e.target.value)} className="flex-1 p-4 rounded-2xl bg-white border border-gray-200 shadow-sm outline-none" placeholder="New Project Name..." />
-                        <button onClick={addProj} className="px-6 rounded-2xl bg-aether-secondary text-white font-bold shadow-md">Add</button>
-                     </div>
-
-                     <div className="space-y-6">
+                <div className="pt-6 pb-32 px-5 animate-soft-rise max-w-md mx-auto">
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="font-display font-bold text-3xl text-aether-dark">Projects</h2>
+                        <button onClick={() => {const t=prompt("Project Title:"); if(t) setProjects([...projects, {id:Date.now(), title:t, category:'Work', progress:0, milestones:[]}])}} className="bg-aether-dark text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg"><Icon name="plus" size={20}/></button>
+                    </div>
+                    
+                    <div className="flex flex-col gap-5">
                         {projects.map(p => (
                             <div key={p.id} className="aerogel-card p-6">
                                 <div className="flex justify-between items-start mb-4">
-                                    <h3 className="font-bold text-xl">{p.title}</h3>
-                                    <button onClick={() => setProjects(projects.filter(x=>x.id !== p.id))} className="text-red-400 p-2"><Icon name="trash" size={16}/></button>
+                                    <span className="px-2 py-1 rounded-md bg-gray-100 text-[10px] font-bold uppercase tracking-wider text-aether-muted">{p.category}</span>
+                                    <button onClick={() => confirm("Delete Project?") && setProjects(projects.filter(x=>x.id!==p.id))} className="text-gray-300 p-1 active:text-red-500"><Icon name="trash-2" size={16} /></button>
                                 </div>
-                                <div className="h-2 bg-gray-100 rounded-full overflow-hidden mb-2">
-                                    <div className="h-full bg-aether-leaf" style={{width: `${p.progress}%`}}></div>
+                                <h3 className="font-display font-bold text-2xl text-aether-dark mb-2">{p.title}</h3>
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="h-2 flex-1 bg-gray-100 rounded-full overflow-hidden">
+                                        <div className="h-full bg-aether-leaf transition-all duration-700" style={{width: `${p.progress}%`}}></div>
+                                    </div>
+                                    <div className="text-xs font-bold text-aether-muted">{p.progress}%</div>
                                 </div>
-                                <div className="flex justify-between text-xs font-bold text-gray-400">
-                                    <span>Progress</span>
-                                    <span>{p.progress}%</span>
+                                
+                                <div className="space-y-2">
+                                    {p.milestones.map(m => (
+                                        <div key={m.id} onClick={() => toggleMilestone(p.id, m.id)} className="flex items-center gap-3 p-2 -mx-2 rounded-lg active:bg-white/50 transition-colors">
+                                            <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${m.done ? 'bg-aether-secondary border-aether-secondary' : 'border-gray-300'}`}>
+                                                {m.done && <Icon name="check" size={10} className="text-white" strokeWidth={4} />}
+                                            </div>
+                                            <span className={`flex-1 text-sm ${m.done ? 'text-gray-400 line-through' : 'text-aether-dark'}`}>{m.text}</span>
+                                        </div>
+                                    ))}
+                                    <button onClick={() => addMilestone(p.id)} className="w-full py-3 mt-2 border border-dashed border-gray-300 rounded-xl text-xs font-bold text-gray-400 uppercase active:bg-gray-50">Add Step</button>
                                 </div>
-                                <input type="range" value={p.progress} onChange={e=>setProjects(projects.map(x => x.id===p.id ? {...x, progress: parseInt(e.target.value)} : x))} className="w-full mt-4 accent-aether-dark" />
                             </div>
                         ))}
-                     </div>
+                    </div>
                 </div>
             );
-        }
+        };
 
-        // --- APP ROOT ---
+        // --- ROOT APP ---
         const App = () => {
             const [view, setView] = useState('home');
             const [xp, setXp] = useState(0);
             const [now, setNow] = useState(new Date());
             
-            // State
-            const today = toISODate(new Date());
+            // Initial Data
+            const todayStr = toISODate(new Date());
             const [schedule, setSchedule] = useState([
-                {id:'1',title:'Morning Routine',duration:1,date: today,startHour:8},
-                {id:'2',title:'Deep Work',duration:2,date: today,startHour:10}
+                {id:'1',title:'Morning Routine',duration:1,date: todayStr,startHour:8},
+                {id:'2',title:'Deep Work',duration:2,date: todayStr,startHour:10}
             ]);
-            const [todos, setTodos] = useState([
-                {id:1,text:"Check Emails",done:false},
-                {id:2,text:"Design Review",done:true}
-            ]);
-            const [projects, setProjects] = useState([
-                {id:1,title:"Mobile App",progress:65},
-                {id:2,title:"Website",progress:30}
-            ]);
+            const [todos, setTodos] = useState([{id:1,text:"Check Emails",done:false},{id:2,text:"Team Sync",done:true}]);
+            const [projects, setProjects] = useState([{id:1,title:"Website Redesign",category:"Design",progress:33,milestones:[{id:1,text:"Wireframes",done:true},{id:2,text:"UI Kit",done:false},{id:3,text:"Dev Handoff",done:false}]}]);
 
             useEffect(() => { const t = setInterval(() => setNow(new Date()), 60000); return () => clearInterval(t); }, []);
-
-            const stats = { 
-                tasksLeft: todos.filter(t=>!t.done).length, 
-                upcomingTodos: todos.filter(t=>!t.done).slice(0,3),
-                currentTask: schedule.find(t => t.date === toISODate(now) && now.getHours() >= t.startHour && now.getHours() < t.startHour + t.duration)
+            
+            const gainXp = (am) => { 
+                setXp(p => { 
+                    const n = p + am; 
+                    if(Math.floor(n/100) > Math.floor(p/100)) { confetti({colors:['#FF4F00', '#0066CC', '#E8E0D5']}); } 
+                    return n; 
+                }) 
             };
+            
+            const toggleTodo = (id) => setTodos(todos.map(t => t.id === id ? {...t, done: !t.done} : t));
+            
+            const currentTask = useMemo(() => {
+                const h = now.getHours();
+                return schedule.find(t => t.date === toISODate(now) && h >= t.startHour && h < t.startHour + t.duration);
+            }, [schedule, now]);
+
+            const stats = { tasksLeft: todos.filter(t=>!t.done).length, completion: todos.length > 0 ? Math.round((todos.filter(t=>t.done).length/todos.length)*100) : 0, currentTask, upcomingTodos: todos.filter(t=>!t.done).slice(0, 3) };
 
             return (
-                <div className="min-h-screen w-full bg-aether-bg">
-                    {/* Background Petals */}
-                    <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-                        <div className="petal" style={{left:'10%', animationDuration:'10s'}}></div>
-                        <div className="petal" style={{left:'70%', animationDuration:'15s', animationDelay:'2s'}}></div>
-                    </div>
-
-                    {/* Views */}
-                    <div className="relative z-10">
-                        {view === 'home' && <HomeView xp={xp} stats={stats} now={now} />}
-                        {view === 'week' && <PlannerView schedule={schedule} setSchedule={setSchedule} now={now} />}
-                        {view === 'day' && <FocusView todos={todos} setTodos={setTodos} />}
-                        {view === 'projects' && <ProjectsView projects={projects} setProjects={setProjects} />}
-                    </div>
-
-                    <MobileNav view={view} setView={setView} />
+                <div className="min-h-screen selection:bg-aether-accent selection:text-white pb-safe">
+                    {view === 'home' && <HomeView xp={xp} stats={stats} now={now} />}
+                    {view === 'week' && <WeeklyPlanner schedule={schedule} setSchedule={setSchedule} now={now} />}
+                    {view === 'day' && <DayView schedule={schedule} todos={todos} toggleTodo={toggleTodo} gainXp={gainXp} now={now} setTodos={setTodos} />}
+                    {view === 'projects' && <ProjectsView projects={projects} setProjects={setProjects} gainXp={gainXp} />}
+                    <CommandDock view={view} setView={setView} />
                 </div>
             );
         };
