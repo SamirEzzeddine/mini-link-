@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Samir OS - High Contrast Fix</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Samir OS - Mobile Adapted</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
@@ -50,7 +50,8 @@
             font-family: 'Inter', sans-serif; 
             background-color: #F5F5F7; 
             color: #1D1D1F; 
-            overflow-x: hidden; 
+            overflow-x: hidden; /* Prevent side scroll on body */
+            -webkit-tap-highlight-color: transparent;
         }
 
         /* --- FALLING ELEMENTS ANIMATION --- */
@@ -102,6 +103,11 @@
         .l2 { left: 40%; animation-duration: 12s; animation-delay: 6s; }
         .l3 { left: 75%; animation-duration: 19s; animation-delay: 2s; }
 
+        /* Reduce particles on mobile for performance */
+        @media (max-width: 768px) {
+            .p2, .p4, .p6, .l2 { display: none; }
+        }
+
         /* --- AEROGEL UI --- */
         .aerogel-card {
             background: var(--glass);
@@ -112,14 +118,17 @@
             border-radius: 24px;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        .aerogel-card:hover { transform: translateY(-2px); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1); }
+        /* Hover effects only on desktop to prevent stuck states on touch */
+        @media (min-width: 769px) {
+            .aerogel-card:hover { transform: translateY(-2px); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1); }
+        }
 
         /* --- VISIBLE BUTTONS --- */
         .btn-control {
             background: white;
             border: 1px solid #E5E5E5;
             color: #1D1D1F;
-            padding: 6px 10px;
+            padding: 8px 12px; /* Larger touch target */
             border-radius: 8px;
             display: flex;
             align-items: center;
@@ -134,11 +143,13 @@
             cursor: pointer;
             opacity: 1 !important;
         }
+        .btn-control:active {
+            transform: scale(0.95);
+        }
         .btn-control:hover {
             background: #FF4F00;
             border-color: #FF4F00;
             color: white;
-            transform: translateY(-1px);
             box-shadow: 0 4px 10px rgba(255, 79, 0, 0.2);
         }
         .btn-control.danger:hover {
@@ -149,7 +160,10 @@
         /* --- UTILS --- */
         .btn-swiss { border-radius: 100px; font-weight: 600; transition: all 0.3s ease; }
         .btn-swiss:active { transform: scale(0.96); }
-        .custom-scrollbar::-webkit-scrollbar { width: 0px; background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar { width: 0px; height: 0px; background: transparent; }
+        
+        /* Mobile Safe Area padding */
+        .safe-pb { padding-bottom: env(safe-area-inset-bottom); }
     </style>
 </head>
 <body>
@@ -179,7 +193,7 @@
         const TASK_LIBRARY = [{ title: "Deep Work", duration: 2 }, { title: "Meeting", duration: 1 }, { title: "Gym", duration: 1 }, { title: "Study", duration: 2 }];
         
         const STYLES = {
-            BTN_PRIMARY: "btn-swiss bg-aether-dark text-white hover:bg-aether-accent hover:shadow-lg hover:shadow-aether-accent/30 px-6 py-3 flex items-center gap-3 shadow-xl shadow-black/5 transition-all",
+            BTN_PRIMARY: "btn-swiss bg-aether-dark text-white hover:bg-aether-accent hover:shadow-lg hover:shadow-aether-accent/30 px-6 py-3 flex items-center gap-3 shadow-xl shadow-black/5 transition-all w-full md:w-auto justify-center md:justify-start",
             BTN_ACCENT: "btn-swiss bg-white text-aether-dark border border-black/5 hover:border-aether-accent hover:text-aether-accent shadow-sm px-5 py-2 flex items-center gap-2 text-sm transition-all",
             INPUT_GLASS: "w-full bg-white p-4 text-aether-dark border border-gray-200 rounded-xl focus:border-aether-accent focus:shadow-lg focus:outline-none transition-all font-sans",
             LABEL_SMALL: "text-[11px] uppercase font-bold text-aether-muted block mb-2 tracking-wider pl-1"
@@ -207,17 +221,18 @@
         });
 
         // --- 1. REIMAGINED DOCK (SMART BAR) ---
+        // Adapted: Fixed position bottom, safe area padding, hides labels on mobile
         const CommandDock = ({ view, setView }) => {
             const items = [
-                { id: 'home', icon: 'layout-grid', label: 'Dashboard' },
-                { id: 'week', icon: 'calendar', label: 'Planner' },
-                { id: 'day', icon: 'zap', label: 'Focus Mode' },
-                { id: 'projects', icon: 'layers', label: 'Projects' },
+                { id: 'home', icon: 'layout-grid', label: 'Dash' },
+                { id: 'week', icon: 'calendar', label: 'Plan' },
+                { id: 'day', icon: 'zap', label: 'Focus' },
+                { id: 'projects', icon: 'layers', label: 'Projs' },
             ];
 
             return (
-                <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4">
-                    <div className="bg-white/80 backdrop-blur-xl border border-white/60 p-2 rounded-2xl shadow-[0_20px_50px_-10px_rgba(0,0,0,0.15)] flex gap-2 items-center justify-between">
+                <div className="fixed bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 z-50 w-full max-w-[95%] md:max-w-2xl px-2 safe-pb">
+                    <div className="bg-white/90 backdrop-blur-xl border border-white/60 p-1.5 md:p-2 rounded-2xl shadow-[0_20px_50px_-10px_rgba(0,0,0,0.2)] flex gap-1 md:gap-2 items-center justify-between">
                         {items.map(item => {
                             const isActive = view === item.id;
                             return (
@@ -225,15 +240,16 @@
                                     key={item.id} 
                                     onClick={() => setView(item.id)} 
                                     className={`
-                                        relative flex items-center justify-center gap-2 flex-1 py-3 px-4 rounded-xl transition-all duration-300 ease-out group
+                                        relative flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 flex-1 py-3 md:py-3 px-2 md:px-4 rounded-xl transition-all duration-300 ease-out group
                                         ${isActive 
-                                            ? 'bg-aether-dark text-white shadow-md -translate-y-1' 
+                                            ? 'bg-aether-dark text-white shadow-md' 
                                             : 'text-aether-muted hover:bg-white hover:text-aether-dark'
                                         }
                                     `}
                                 >
-                                    <Icon name={item.icon} size={18} strokeWidth={isActive ? 2.5 : 2} />
-                                    <span className={`text-xs font-bold uppercase tracking-wide transition-all duration-300 ${isActive ? 'opacity-100' : 'hidden md:block opacity-70 group-hover:opacity-100'}`}>
+                                    <Icon name={item.icon} size={20} strokeWidth={isActive ? 2.5 : 2} />
+                                    {/* Text hidden on mobile, visible on desktop */}
+                                    <span className={`text-[10px] md:text-xs font-bold uppercase tracking-wide transition-all duration-300 ${isActive ? 'opacity-100' : 'hidden md:block opacity-70 group-hover:opacity-100'}`}>
                                         {item.label}
                                     </span>
                                     {isActive && <div className="absolute -top-1 right-1 w-1.5 h-1.5 bg-aether-accent rounded-full animate-pulse"></div>}
@@ -246,6 +262,7 @@
         };
 
         // --- 2. HOME VIEW ---
+        // Adapted: Flex-col for mobile stacking, smaller fonts for mobile
         const HomeView = ({ xp, stats, now }) => {
             const level = Math.floor(xp / 100) + 1;
             const progress = xp % 100; 
@@ -253,47 +270,47 @@
             const offset = circumference - (progress / 100) * circumference;
 
             return (
-                <div className="max-w-5xl mx-auto pt-16 pb-40 px-8 animate-soft-rise">
-                    <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-12 mb-16">
-                        <div className="flex items-center gap-8">
-                            <div className="relative w-32 h-32">
+                <div className="max-w-5xl mx-auto pt-8 md:pt-16 pb-40 px-4 md:px-8 animate-soft-rise">
+                    <div className="flex flex-col md:flex-row items-center md:items-end justify-between gap-8 md:gap-12 mb-12">
+                        <div className="flex flex-col md:flex-row items-center gap-6 md:gap-8 text-center md:text-left">
+                            <div className="relative w-24 h-24 md:w-32 md:h-32 shrink-0">
                                 <svg className="w-full h-full transform -rotate-90 drop-shadow-lg">
-                                    <circle className="stroke-white/60 fill-none" cx="64" cy="64" r="50" strokeWidth="6" />
-                                    <circle className="stroke-aether-accent fill-none transition-all duration-1000" cx="64" cy="64" r="50" strokeWidth="6" strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" />
+                                    <circle className="stroke-white/60 fill-none" cx="50%" cy="50%" r="46%" strokeWidth="6" />
+                                    <circle className="stroke-aether-accent fill-none transition-all duration-1000" cx="50%" cy="50%" r="46%" strokeWidth="6" strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" />
                                 </svg>
-                                <div className="absolute inset-4 rounded-full overflow-hidden border-4 border-white shadow-sm bg-gray-200">
+                                <div className="absolute inset-3 rounded-full overflow-hidden border-4 border-white shadow-sm bg-gray-200">
                                     <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=400&q=80" className="w-full h-full object-cover filter sepia-[.25] contrast-110 brightness-110" />
                                 </div>
                                 <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-white text-aether-dark shadow-md text-[11px] font-bold px-3 py-1 rounded-full border border-gray-100">Lvl {level}</div>
                             </div>
                             <div>
-                                <h1 className="font-display font-bold text-6xl text-aether-dark mb-2 tracking-tight">Samir OS</h1>
-                                <div className="flex items-center gap-3 text-aether-muted font-medium">
+                                <h1 className="font-display font-bold text-4xl md:text-6xl text-aether-dark mb-2 tracking-tight">Samir OS</h1>
+                                <div className="flex items-center justify-center md:justify-start gap-3 text-aether-muted font-medium">
                                     <span className="w-2 h-2 rounded-full bg-aether-leaf animate-pulse"></span>
                                     <span>System Operational</span>
                                 </div>
                             </div>
                         </div>
-                        <div className="text-right">
-                            <div className="font-display font-bold text-8xl text-aether-dark tracking-tighter leading-none">
+                        <div className="text-center md:text-right">
+                            <div className="font-display font-bold text-6xl md:text-8xl text-aether-dark tracking-tighter leading-none">
                                 {now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                             </div>
-                            <div className="text-aether-secondary font-bold text-sm mt-2 uppercase tracking-widest">
+                            <div className="text-aether-secondary font-bold text-xs md:text-sm mt-2 uppercase tracking-widest">
                                 {now.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
                             </div>
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-                        <div className="md:col-span-7 aerogel-card p-10 relative overflow-hidden group">
-                            <div className="absolute -right-20 -top-20 w-64 h-64 bg-aether-sand/30 rounded-full blur-3xl"></div>
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
+                        <div className="md:col-span-7 aerogel-card p-6 md:p-10 relative overflow-hidden group">
+                            <div className="absolute -right-20 -top-20 w-64 h-64 bg-aether-sand/30 rounded-full blur-3xl pointer-events-none"></div>
                             <div className="relative z-10">
-                                <div className="flex items-center gap-3 mb-8">
+                                <div className="flex items-center gap-3 mb-6 md:mb-8">
                                     <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm text-aether-accent"><Icon name="radio" size={16} /></div>
                                     <span className="text-aether-muted text-xs font-bold uppercase tracking-widest">Directives</span>
                                 </div>
-                                <h2 className="font-display font-bold text-4xl text-aether-dark mb-4 leading-tight">{stats.currentTask ? stats.currentTask.title : "Leisure Time"}</h2>
-                                <p className="text-aether-muted text-lg mb-10 font-light max-w-md">
+                                <h2 className="font-display font-bold text-3xl md:text-4xl text-aether-dark mb-4 leading-tight">{stats.currentTask ? stats.currentTask.title : "Leisure Time"}</h2>
+                                <p className="text-aether-muted text-base md:text-lg mb-8 md:mb-10 font-light max-w-md">
                                     {stats.currentTask ? `Scheduled until ${stats.currentTask.startHour + stats.currentTask.duration}:00. Stay focused.` : "No active tasks. Enjoy the day."}
                                 </p>
                                 <button className={STYLES.BTN_PRIMARY}>
@@ -303,20 +320,20 @@
                         </div>
 
                         <div className="md:col-span-5 flex flex-col gap-6">
-                            <div className="aerogel-card p-8 flex items-center justify-between">
+                            <div className="aerogel-card p-6 md:p-8 flex items-center justify-between">
                                 <div>
-                                    <div className="text-5xl font-display font-bold text-aether-dark mb-1">{stats.tasksLeft}</div>
+                                    <div className="text-4xl md:text-5xl font-display font-bold text-aether-dark mb-1">{stats.tasksLeft}</div>
                                     <div className="text-aether-muted text-xs font-bold uppercase tracking-wider">Tasks Pending</div>
                                 </div>
                                 <div className="w-16 h-16 rounded-2xl bg-aether-secondary/10 text-aether-secondary flex items-center justify-center"><Icon name="layers" size={32} /></div>
                             </div>
-                            <div className="aerogel-card p-8 flex-1">
+                            <div className="aerogel-card p-6 md:p-8 flex-1">
                                 <div className="text-aether-muted text-xs font-bold uppercase tracking-wider mb-6 flex items-center gap-2"><Icon name="list" size={14}/> Up Next</div>
                                 <ul className="space-y-4">
                                     {stats.upcomingTodos.map(t => (
                                         <li key={t.id} className="flex items-center gap-4 text-aether-dark">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-aether-accent"></div>
-                                            <span className="font-medium">{t.text}</span>
+                                            <div className="w-1.5 h-1.5 rounded-full bg-aether-accent shrink-0"></div>
+                                            <span className="font-medium text-sm md:text-base truncate">{t.text}</span>
                                         </li>
                                     ))}
                                     {stats.upcomingTodos.length === 0 && <li className="text-aether-muted italic">All clear.</li>}
@@ -328,7 +345,7 @@
             );
         };
 
-        // --- 3. WEEKLY PLANNER (High Contrast Navigation) ---
+        // --- 3. WEEKLY PLANNER (Mobile Scroll Fix) ---
         const WeeklyPlanner = ({ schedule, setSchedule, now }) => {
             const [viewMode, setViewMode] = useState('week'); 
             const [focusDate, setFocusDate] = useState(new Date(now));
@@ -348,9 +365,11 @@
 
             const goToToday = () => { setFocusDate(new Date()); setViewMode('week'); };
 
-            // --- DRAG & DROP ---
+            // --- DRAG & DROP (Simplistic implementation for demo) ---
             const handleDragStart = (e, type, item) => { 
                 setDragData({ type, item }); 
+                // Mobile often has issues with standard HTML5 DnD, relies on Touch API
+                // Keeping this for desktop usage mainly
                 e.dataTransfer.effectAllowed = 'move'; 
             };
             
@@ -383,15 +402,15 @@
                 const startYear = Math.floor(currentYear / 10) * 10; 
                 const years = Array.from({ length: 12 }, (_, i) => startYear - 1 + i); 
                 return (
-                    <div className="p-8 animate-soft-rise">
-                         <div className="grid grid-cols-3 md:grid-cols-4 gap-6">
+                    <div className="p-4 md:p-8 animate-soft-rise pb-32">
+                         <div className="grid grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
                             {years.map(y => {
                                 const isCurrentYear = new Date().getFullYear() === y;
                                 const isSelectedYear = currentYear === y;
                                 const isOutOfDecade = y < startYear || y > startYear + 9;
                                 return (
-                                    <div key={y} onClick={() => { const d = new Date(focusDate); d.setFullYear(y); setFocusDate(d); setViewMode('year'); }} className={`aerogel-card h-32 flex items-center justify-center cursor-pointer transition-all hover:shadow-lg hover:-translate-y-1 ${isSelectedYear ? 'bg-aether-dark text-white' : 'hover:bg-white'} ${isCurrentYear ? 'border-2 border-aether-accent' : ''} ${isOutOfDecade ? 'opacity-40' : 'opacity-100'}`}>
-                                        <div className={`font-display font-bold text-3xl ${isSelectedYear ? 'text-white' : 'text-aether-dark'}`}>{y}</div>
+                                    <div key={y} onClick={() => { const d = new Date(focusDate); d.setFullYear(y); setFocusDate(d); setViewMode('year'); }} className={`aerogel-card h-24 md:h-32 flex items-center justify-center cursor-pointer transition-all active:scale-95 ${isSelectedYear ? 'bg-aether-dark text-white' : 'hover:bg-white'} ${isCurrentYear ? 'border-2 border-aether-accent' : ''} ${isOutOfDecade ? 'opacity-40' : 'opacity-100'}`}>
+                                        <div className={`font-display font-bold text-xl md:text-3xl ${isSelectedYear ? 'text-white' : 'text-aether-dark'}`}>{y}</div>
                                     </div>
                                 )
                             })}
@@ -403,14 +422,14 @@
             const YearView = () => {
                 const year = focusDate.getFullYear();
                 return (
-                    <div className="p-8 animate-soft-rise">
-                        <div className="grid grid-cols-3 md:grid-cols-4 gap-6">
+                    <div className="p-4 md:p-8 animate-soft-rise pb-32">
+                        <div className="grid grid-cols-3 md:grid-cols-4 gap-3 md:gap-6">
                             {MONTHS.map((m, i) => {
                                  const isCurrentMonth = new Date().getMonth() === i && new Date().getFullYear() === year;
                                  return (
-                                    <div key={m} onClick={() => { const d = new Date(focusDate); d.setMonth(i); setFocusDate(d); setViewMode('month'); }} className={`aerogel-card p-6 hover:bg-white cursor-pointer transition-all group aspect-square flex flex-col justify-between ${isCurrentMonth ? 'border-aether-accent/50 bg-aether-accent/5' : ''}`}>
-                                        <div className={`text-lg font-bold ${isCurrentMonth ? 'text-aether-accent' : 'text-aether-dark'}`}>{m}</div>
-                                        <div className="text-4xl font-display font-bold text-gray-200 group-hover:text-gray-300">{i+1}</div>
+                                    <div key={m} onClick={() => { const d = new Date(focusDate); d.setMonth(i); setFocusDate(d); setViewMode('month'); }} className={`aerogel-card p-3 md:p-6 hover:bg-white cursor-pointer transition-all group aspect-square flex flex-col justify-between ${isCurrentMonth ? 'border-aether-accent/50 bg-aether-accent/5' : ''}`}>
+                                            <div className={`text-xs md:text-lg font-bold truncate ${isCurrentMonth ? 'text-aether-accent' : 'text-aether-dark'}`}>{m.substring(0,3)}</div>
+                                            <div className="text-2xl md:text-4xl font-display font-bold text-gray-200 group-hover:text-gray-300">{i+1}</div>
                                     </div>
                                  )
                             })}
@@ -428,21 +447,25 @@
                 const blanks = Array(startDayIdx).fill(null);
                 const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
                 return (
-                    <div className="p-8 animate-soft-rise h-full flex flex-col">
+                    <div className="p-4 md:p-8 animate-soft-rise h-full flex flex-col pb-32">
                         <div className="grid grid-cols-7 mb-4">
-                            {DAYS.map(d => <div key={d} className="text-center text-xs font-bold uppercase text-aether-muted">{d}</div>)}
+                            {DAYS.map(d => <div key={d} className="text-center text-[10px] md:text-xs font-bold uppercase text-aether-muted">{d.substring(0,1)}</div>)}
                         </div>
-                        <div className="grid grid-cols-7 grid-rows-6 gap-2 flex-1">
+                        <div className="grid grid-cols-7 auto-rows-fr gap-1 md:gap-2 flex-1 min-h-[300px]">
                             {blanks.map((_, i) => <div key={`b-${i}`}></div>)}
                             {days.map(d => {
                                 const dateStr = toISODate(new Date(year, month, d));
                                 const isToday = dateStr === toISODate(new Date());
                                 const tasksForDay = schedule.filter(t => t.date === dateStr);
                                 return (
-                                    <div key={d} onClick={() => { const date = new Date(year, month, d); setFocusDate(date); setViewMode('week'); }} className={`rounded-xl border p-2 cursor-pointer transition-all hover:shadow-lg relative overflow-hidden flex flex-col ${isToday ? 'bg-white border-aether-accent shadow-md' : 'bg-white/40 border-white/60 hover:bg-white'}`}>
-                                        <div className={`text-sm font-bold mb-1 w-6 h-6 flex items-center justify-center rounded-full ${isToday ? 'bg-aether-accent text-white' : 'text-aether-dark'}`}>{d}</div>
-                                        <div className="flex-1 overflow-hidden space-y-1">
+                                    <div key={d} onClick={() => { const date = new Date(year, month, d); setFocusDate(date); setViewMode('week'); }} className={`rounded-lg md:rounded-xl border p-1 md:p-2 cursor-pointer transition-all active:scale-95 relative overflow-hidden flex flex-col min-h-[60px] ${isToday ? 'bg-white border-aether-accent shadow-md' : 'bg-white/40 border-white/60 hover:bg-white'}`}>
+                                        <div className={`text-xs font-bold mb-1 w-5 h-5 md:w-6 md:h-6 flex items-center justify-center rounded-full ${isToday ? 'bg-aether-accent text-white' : 'text-aether-dark'}`}>{d}</div>
+                                        <div className="flex-1 overflow-hidden space-y-1 hidden md:block">
                                             {tasksForDay.slice(0,3).map(t => <div key={t.id} className="h-1.5 w-full rounded-full bg-aether-secondary/50"></div>)}
+                                        </div>
+                                        {/* Mobile Dots for tasks */}
+                                        <div className="flex md:hidden gap-0.5 flex-wrap mt-1">
+                                            {tasksForDay.slice(0,4).map(t => <div key={t.id} className="w-1 h-1 rounded-full bg-aether-secondary"></div>)}
                                         </div>
                                     </div>
                                 )
@@ -452,41 +475,48 @@
                 );
             };
 
+            // Adapted: Horizontal scroll wrapper for mobile
             const WeekView = () => {
                 const startOfWk = getStartOfWeek(focusDate);
                 const weekDates = Array.from({length: 7}, (_, i) => addDays(startOfWk, i));
                 return (
-                    <div className="flex-1 overflow-auto relative z-10 custom-scrollbar animate-soft-rise">
-                        <div className="min-w-[900px] grid grid-cols-[60px_repeat(7,_1fr)] bg-white/40">
-                            <div className="border-r border-white/60 bg-white/50 sticky left-0 z-20 backdrop-blur-sm">
-                                <div className="h-14 border-b border-white/60 sticky top-0 z-30 bg-white/80"></div>
-                                {HOURS.map(h => <div key={h} className="h-20 border-b border-white/60 text-[10px] font-bold text-aether-muted text-center pt-2">{h}:00</div>)}
+                    <div className="flex-1 overflow-hidden relative z-10 animate-soft-rise">
+                        {/* This div provides horizontal scroll on mobile while keeping desktop layout fixed if space allows */}
+                        <div className="h-full overflow-auto custom-scrollbar">
+                            <div className="min-w-[800px] grid grid-cols-[50px_repeat(7,_1fr)] bg-white/40 pb-32">
+                                <div className="border-r border-white/60 bg-white/50 sticky left-0 z-20 backdrop-blur-sm">
+                                    <div className="h-12 md:h-14 border-b border-white/60 sticky top-0 z-30 bg-white/80"></div>
+                                    {HOURS.map(h => <div key={h} className="h-16 md:h-20 border-b border-white/60 text-[10px] font-bold text-aether-muted text-center pt-2">{h}:00</div>)}
+                                </div>
+                                {weekDates.map((date, dayIdx) => {
+                                    const isToday = toISODate(date) === toISODate(new Date());
+                                    const dateStr = toISODate(date);
+                                    const dayTasks = schedule.filter(t => t.date === dateStr);
+                                    return (
+                                        <div key={dateStr} className={`border-r border-white/60 relative min-w-[100px] ${isToday ? 'bg-white/50' : ''}`}>
+                                            <div className={`h-12 md:h-14 border-b border-white/60 sticky top-0 z-20 flex flex-col items-center justify-center ${isToday ? 'bg-aether-accent text-white shadow-md' : 'bg-white/80 text-aether-muted'}`}>
+                                                <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest">{DAYS[dayIdx]}</span>
+                                                <span className="text-base md:text-lg font-display font-bold leading-none">{date.getDate()}</span>
+                                            </div>
+                                            <div className="relative">
+                                                {isToday && <div className="absolute w-full z-20 pointer-events-none flex items-center" style={{top: `${(now.getHours() * (window.innerWidth < 768 ? 64 : 80)) + (now.getMinutes() * ((window.innerWidth < 768 ? 64 : 80)/60))}px`}}><div className="w-2 h-2 bg-aether-accent rounded-full -ml-1 shadow-sm"></div><div className="h-px bg-aether-accent w-full opacity-50"></div></div>}
+                                                {HOURS.map(h => <div key={h} className="h-16 md:h-20 border-b border-white/40" onDragOver={e=>e.preventDefault()} onDrop={(e) => handleDrop(e, dateStr, h)}></div>)}
+                                                {dayTasks.map(task => (
+                                                    <div key={task.id} onClick={() => setEditTask(task)} 
+                                                        className="absolute inset-x-0.5 md:inset-x-1 p-1 md:p-3 rounded-lg cursor-pointer bg-aether-dark text-white shadow-lg active:scale-95 transition-all z-10 flex flex-col justify-center overflow-hidden border border-white/10 group" 
+                                                        style={{
+                                                            top: `${task.startHour * (window.innerWidth < 768 ? 64 : 80) + 2}px`, 
+                                                            height: `${task.duration * (window.innerWidth < 768 ? 64 : 80) - 4}px`
+                                                        }}>
+                                                        <div className="font-bold text-[10px] md:text-xs leading-tight truncate">{task.title}</div>
+                                                        <div className="text-[8px] md:text-[10px] opacity-70 mt-0.5">{task.duration}h</div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )
+                                })}
                             </div>
-                            {weekDates.map((date, dayIdx) => {
-                                const isToday = toISODate(date) === toISODate(new Date());
-                                const dateStr = toISODate(date);
-                                const dayTasks = schedule.filter(t => t.date === dateStr);
-                                return (
-                                    <div key={dateStr} className={`border-r border-white/60 relative min-w-[120px] ${isToday ? 'bg-white/50' : ''}`}>
-                                        <div className={`h-14 border-b border-white/60 sticky top-0 z-20 flex flex-col items-center justify-center ${isToday ? 'bg-aether-accent text-white shadow-md' : 'bg-white/80 text-aether-muted'}`}>
-                                            <span className="text-[10px] font-bold uppercase tracking-widest">{DAYS[dayIdx]}</span>
-                                            <span className="text-lg font-display font-bold leading-none">{date.getDate()}</span>
-                                        </div>
-                                        <div className="relative">
-                                            {isToday && <div className="absolute w-full z-20 pointer-events-none flex items-center" style={{top: `${(now.getHours() * 80) + (now.getMinutes() * (80/60))}px`}}><div className="w-2 h-2 bg-aether-accent rounded-full -ml-1 shadow-sm"></div><div className="h-px bg-aether-accent w-full opacity-50"></div></div>}
-                                            {HOURS.map(h => <div key={h} className="h-20 border-b border-white/40 hover:bg-white/40 transition-colors" onDragOver={e=>e.preventDefault()} onDrop={(e) => handleDrop(e, dateStr, h)}></div>)}
-                                            {dayTasks.map(task => (
-                                                <div key={task.id} draggable onDragStart={(e) => handleDragStart(e, 'SCHEDULED', task)} onClick={() => setEditTask(task)} 
-                                                    className="absolute inset-x-1 p-3 rounded-xl cursor-pointer bg-aether-dark text-white shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all z-10 flex flex-col justify-center overflow-hidden border border-white/10 group" 
-                                                    style={{top: `${task.startHour * 80 + 2}px`, height: `${task.duration * 80 - 4}px`}}>
-                                                    <div className="font-bold text-xs leading-tight">{task.title}</div>
-                                                    <div className="text-[10px] opacity-70 mt-1">{task.duration}h</div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )
-                            })}
                         </div>
                     </div>
                 );
@@ -495,8 +525,8 @@
             // EDIT MODAL
             const editModal = editTask ? (
                 <div className="fixed inset-0 z-[9999] flex items-center justify-center px-4">
-                    <div className="absolute inset-0 bg-white/70 backdrop-blur-sm" onClick={() => setEditTask(null)}></div>
-                    <div className="bg-white border border-gray-200 p-8 rounded-[32px] w-full max-w-sm shadow-2xl relative z-10 animate-soft-rise">
+                    <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setEditTask(null)}></div>
+                    <div className="bg-white border border-gray-200 p-6 md:p-8 rounded-[32px] w-full max-w-sm shadow-2xl relative z-10 animate-soft-rise">
                         <h3 className="font-display font-bold text-2xl mb-6 text-aether-dark">Edit Session</h3>
                         <div className="space-y-6">
                             <div><label className={STYLES.LABEL_SMALL}>Title</label><input value={editTask.title} onChange={e => setEditTask({...editTask, title: e.target.value})} className={STYLES.INPUT_GLASS}/></div>
@@ -524,41 +554,35 @@
             }
 
             return (
-                <div className="h-full flex flex-col animate-soft-rise pb-24 relative overflow-hidden">
+                <div className="h-full flex flex-col animate-soft-rise relative overflow-hidden">
                     {/* NAVIGATION BAR */}
-                    <div className="px-6 py-4 border-b border-white/60 bg-white/60 sticky top-0 z-30 backdrop-blur-xl flex flex-wrap gap-4 justify-between items-center shadow-sm">
-                        <div className="flex items-center gap-2">
-                            
-                            {/* FIXED ARROW BUTTONS: BLACK SQUARES, WHITE ICONS */}
-                            <button onClick={() => navigate(-1)} className="w-10 h-10 bg-[#1D1D1F] rounded-lg flex items-center justify-center text-white shadow-lg hover:bg-[#FF4F00] hover:scale-105 transition-all duration-200 z-50 relative" title="Previous">
-                                <Icon name="arrow-left" size={20} strokeWidth={3} />
-                            </button>
-                            <button onClick={() => navigate(1)} className="w-10 h-10 bg-[#1D1D1F] rounded-lg flex items-center justify-center text-white shadow-lg hover:bg-[#FF4F00] hover:scale-105 transition-all duration-200 z-50 relative" title="Next">
-                                <Icon name="arrow-right" size={20} strokeWidth={3} />
-                            </button>
-                            
-                            <button onClick={goToToday} className="ml-2 px-3 py-1 text-xs font-bold uppercase text-aether-muted hover:text-aether-accent tracking-widest transition-colors">Today</button>
-                            
-                            <h2 className="font-display font-bold text-2xl text-aether-dark w-48 transition-all whitespace-nowrap ml-2">{getHeaderLabel()}</h2>
-                            
-                            <div className="flex bg-gray-100/50 p-1 rounded-lg border border-gray-200/50 ml-4">
-                                {['Week', 'Month', 'Year', 'Decade'].map(m => (
-                                    <button key={m} onClick={() => setViewMode(m.toLowerCase())} className={`px-3 py-1 rounded-md text-xs font-bold uppercase transition-all ${viewMode === m.toLowerCase() ? 'bg-white text-aether-dark shadow-sm' : 'text-aether-muted hover:text-aether-dark'}`}>{m}</button>
-                                ))}
+                    <div className="px-4 md:px-6 py-3 md:py-4 border-b border-white/60 bg-white/60 sticky top-0 z-30 backdrop-blur-xl flex flex-col md:flex-row gap-3 md:gap-4 justify-between items-stretch md:items-center shadow-sm">
+                        <div className="flex items-center justify-between w-full md:w-auto gap-2">
+                            <div className="flex items-center gap-2">
+                                <button onClick={() => navigate(-1)} className="w-8 h-8 md:w-10 md:h-10 bg-[#1D1D1F] rounded-lg flex items-center justify-center text-white shadow-lg hover:bg-[#FF4F00] active:scale-95 transition-all duration-200 z-50 relative" title="Previous">
+                                    <Icon name="arrow-left" size={16} strokeWidth={3} />
+                                </button>
+                                <button onClick={() => navigate(1)} className="w-8 h-8 md:w-10 md:h-10 bg-[#1D1D1F] rounded-lg flex items-center justify-center text-white shadow-lg hover:bg-[#FF4F00] active:scale-95 transition-all duration-200 z-50 relative" title="Next">
+                                    <Icon name="arrow-right" size={16} strokeWidth={3} />
+                                </button>
+                                <button onClick={goToToday} className="ml-1 px-2 py-1 text-[10px] font-bold uppercase text-aether-muted hover:text-aether-accent tracking-widest transition-colors">Today</button>
                             </div>
+                            <h2 className="font-display font-bold text-xl md:text-2xl text-aether-dark whitespace-nowrap">{getHeaderLabel()}</h2>
                         </div>
 
-                        {viewMode === 'week' && (
-                            <div className="flex items-center gap-3">
-                                <div className="flex items-center bg-white rounded-full border border-gray-200 p-1 shadow-sm">
-                                    <input value={customTaskName} onChange={(e) => setCustomTaskName(e.target.value)} placeholder="New Task..." className="bg-transparent px-4 py-1 text-sm outline-none w-32 text-aether-dark"/>
-                                    <div draggable onDragStart={(e) => handleDragStart(e, 'LIBRARY', {title: customTaskName || "Task", duration: 1})} className="w-8 h-8 bg-aether-dark rounded-full flex items-center justify-center text-white cursor-grab active:cursor-grabbing hover:bg-aether-accent transition-colors"><Icon name="plus" size={16}/></div>
-                                </div>
-                                {TASK_LIBRARY.map((task, i) => (
-                                    <div key={i} draggable onDragStart={(e) => handleDragStart(e, 'LIBRARY', task)} className="hidden md:block px-4 py-2 bg-white border border-gray-200 rounded-full text-xs font-bold text-aether-muted hover:text-aether-dark hover:border-aether-dark cursor-grab transition-colors shadow-sm">{task.title}</div>
+                        <div className="flex overflow-x-auto pb-1 md:pb-0 hide-scrollbar justify-between md:justify-end gap-2">
+                             <div className="flex bg-gray-100/50 p-1 rounded-lg border border-gray-200/50 shrink-0">
+                                {['Week', 'Month', 'Year', 'Decade'].map(m => (
+                                    <button key={m} onClick={() => setViewMode(m.toLowerCase())} className={`px-2 md:px-3 py-1 rounded-md text-[10px] md:text-xs font-bold uppercase transition-all ${viewMode === m.toLowerCase() ? 'bg-white text-aether-dark shadow-sm' : 'text-aether-muted hover:text-aether-dark'}`}>{m}</button>
                                 ))}
                             </div>
-                        )}
+                             {/* Task Adder - Simplified for mobile */}
+                            {viewMode === 'week' && (
+                                <div className="flex items-center bg-white rounded-full border border-gray-200 p-1 shadow-sm shrink-0">
+                                    <div draggable onDragStart={(e) => handleDragStart(e, 'LIBRARY', {title: "New Task", duration: 1})} className="w-6 h-6 md:w-8 md:h-8 bg-aether-dark rounded-full flex items-center justify-center text-white cursor-grab active:cursor-grabbing"><Icon name="plus" size={14}/></div>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     {viewMode === 'decade' && <DecadeView />}
@@ -571,7 +595,7 @@
             );
         };
 
-        // --- 4. DAY VIEW (Fixed Delete Buttons) ---
+        // --- 4. DAY VIEW (Adapted for vertical stacking) ---
         const DayView = ({ schedule, todos, toggleTodo, gainXp, now, setTodos }) => {
             const currentHour = now.getHours();
             const todayStr = toISODate(now);
@@ -593,40 +617,40 @@
             const addTodo = () => { if(newTodo.trim()) { setTodos([...todos, {id: Date.now(), text: newTodo, done: false}]); setNewTodo(""); }};
             
             return (
-                <div className="max-w-4xl mx-auto pt-10 pb-32 px-6 animate-soft-rise">
-                    <div className="aerogel-card rounded-3xl p-12 mb-10 text-center relative overflow-hidden">
+                <div className="max-w-4xl mx-auto pt-6 md:pt-10 pb-32 px-4 md:px-6 animate-soft-rise">
+                    <div className="aerogel-card rounded-3xl p-8 md:p-12 mb-8 md:mb-10 text-center relative overflow-hidden">
                         <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-aether-secondary via-aether-accent to-aether-secondary opacity-50"></div>
                         <div className="inline-flex flex-col items-center relative z-10">
-                            <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-aether-muted mb-8">Focus Session</div>
-                            <div className="font-display font-bold text-9xl text-aether-dark tabular-nums tracking-tighter mb-10">
+                            <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-aether-muted mb-6 md:mb-8">Focus Session</div>
+                            <div className="font-display font-bold text-7xl md:text-9xl text-aether-dark tabular-nums tracking-tighter mb-8 md:mb-10">
                                 {Math.floor(timeLeft/60).toString().padStart(2,'0')}<span className="text-gray-300">:</span>{(timeLeft%60).toString().padStart(2,'0')}
                             </div>
-                            <div className="flex items-center gap-4 bg-white p-2 pr-3 rounded-full shadow-lg border border-gray-100">
-                                <div className="px-6 border-r border-gray-200">
-                                    <input type="number" value={focusDuration} onChange={handleDurationChange} className="w-12 text-center font-bold text-xl text-aether-dark bg-transparent outline-none"/>
-                                    <span className="text-[10px] font-bold text-aether-muted uppercase block">Min</span>
+                            <div className="flex items-center gap-3 md:gap-4 bg-white p-2 pr-3 rounded-full shadow-lg border border-gray-100">
+                                <div className="px-4 md:px-6 border-r border-gray-200">
+                                    <input type="number" value={focusDuration} onChange={handleDurationChange} className="w-10 md:w-12 text-center font-bold text-lg md:text-xl text-aether-dark bg-transparent outline-none"/>
+                                    <span className="text-[9px] md:text-[10px] font-bold text-aether-muted uppercase block">Min</span>
                                 </div>
-                                <button onClick={() => setIsActive(!isActive)} className={`w-14 h-14 rounded-full flex items-center justify-center text-white transition-all shadow-md hover:shadow-lg hover:scale-105 ${isActive ? 'bg-aether-accent' : 'bg-aether-dark'}`}>
-                                    <Icon name={isActive ? "pause" : "play"} size={24} fill="currentColor" />
+                                <button onClick={() => setIsActive(!isActive)} className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-white transition-all shadow-md active:scale-95 ${isActive ? 'bg-aether-accent' : 'bg-aether-dark'}`}>
+                                    <Icon name={isActive ? "pause" : "play"} size={20} fill="currentColor" />
                                 </button>
-                                <button onClick={() => {setIsActive(false); setTimeLeft(focusDuration * 60);}} className="w-10 h-10 rounded-full bg-gray-100 text-aether-muted hover:text-aether-dark hover:bg-gray-200 flex items-center justify-center transition-colors"><Icon name="rotate-ccw" size={18} /></button>
+                                <button onClick={() => {setIsActive(false); setTimeLeft(focusDuration * 60);}} className="w-10 h-10 rounded-full bg-gray-100 text-aether-muted hover:text-aether-dark hover:bg-gray-200 flex items-center justify-center transition-colors active:scale-95"><Icon name="rotate-ccw" size={16} /></button>
                             </div>
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="aerogel-card p-8">
-                            <h3 className="font-display font-bold text-2xl mb-6 text-aether-dark">Timeline</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                        <div className="aerogel-card p-6 md:p-8">
+                            <h3 className="font-display font-bold text-xl md:text-2xl mb-4 md:mb-6 text-aether-dark">Timeline</h3>
                             <div className="space-y-4">
                                 {sortedSchedule.map(t => {
                                     const isPast = currentHour >= t.startHour + t.duration;
                                     const isNow = currentHour >= t.startHour && currentHour < t.startHour + t.duration;
                                     return (
-                                        <div key={t.id} className={`flex gap-4 items-center transition-all ${isPast ? 'opacity-40' : ''}`}>
-                                            <div className="text-xs font-bold text-aether-muted w-12 text-right">{t.startHour}:00</div>
-                                            <div className={`flex-1 p-4 rounded-2xl border transition-all ${isNow ? 'bg-aether-dark text-white shadow-lg scale-105 border-transparent' : 'bg-white border-gray-100 text-aether-dark'}`}>
-                                                <div className="font-bold text-lg">{t.title}</div>
-                                                <div className="text-xs opacity-70 uppercase tracking-wider mt-1">{t.duration} Hours</div>
+                                        <div key={t.id} className={`flex gap-3 md:gap-4 items-center transition-all ${isPast ? 'opacity-40' : ''}`}>
+                                            <div className="text-xs font-bold text-aether-muted w-10 md:w-12 text-right">{t.startHour}:00</div>
+                                            <div className={`flex-1 p-3 md:p-4 rounded-2xl border transition-all ${isNow ? 'bg-aether-dark text-white shadow-lg scale-105 border-transparent' : 'bg-white border-gray-100 text-aether-dark'}`}>
+                                                <div className="font-bold text-base md:text-lg">{t.title}</div>
+                                                <div className="text-[10px] md:text-xs opacity-70 uppercase tracking-wider mt-1">{t.duration} Hours</div>
                                             </div>
                                         </div>
                                     );
@@ -635,28 +659,25 @@
                             </div>
                         </div>
 
-                        <div className="aerogel-card p-8">
-                            <div className="flex justify-between items-end mb-6">
-                                <h3 className="font-display font-bold text-2xl text-aether-dark">Tasks</h3>
+                        <div className="aerogel-card p-6 md:p-8">
+                            <div className="flex justify-between items-end mb-4 md:mb-6">
+                                <h3 className="font-display font-bold text-xl md:text-2xl text-aether-dark">Tasks</h3>
                                 {todos.length > 0 && <button onClick={()=>confirm("Clear?") && setTodos([])} className="btn-control danger text-red-500 border-red-100"><Icon name="trash-2" size={12}/> Clear</button>}
                             </div>
                             <div className="flex gap-2 mb-6">
                                 <input type="text" value={newTodo} onChange={(e) => setNewTodo(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && addTodo()} placeholder="Add task..." className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-aether-dark transition-colors"/>
-                                <button onClick={addTodo} className="bg-aether-dark text-white w-12 rounded-xl flex items-center justify-center hover:bg-aether-accent transition-colors"><Icon name="plus" size={20}/></button>
+                                <button onClick={addTodo} className="bg-aether-dark text-white w-12 rounded-xl flex items-center justify-center active:bg-aether-accent transition-colors"><Icon name="plus" size={20}/></button>
                             </div>
                             <div className="space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar">
                                 {todos.map(t => (
-                                    <div key={t.id} onClick={() => { toggleTodo(t.id); if(!t.done) gainXp(10); }} className={`group flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all ${t.done ? 'bg-transparent opacity-40' : 'bg-white border border-gray-100 hover:border-aether-secondary'}`}>
+                                    <div key={t.id} onClick={() => { toggleTodo(t.id); if(!t.done) gainXp(10); }} className={`group flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all active:scale-95 ${t.done ? 'bg-transparent opacity-40' : 'bg-white border border-gray-100 hover:border-aether-secondary'}`}>
                                         <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${t.done ? 'bg-aether-dark border-aether-dark text-white' : 'border-gray-300'}`}>
                                             {t.done && <Icon name="check" size={12} />}
                                         </div>
-                                        <span className={`flex-1 font-medium ${t.done ? 'line-through decoration-2' : ''}`}>{t.text}</span>
-                                        
-                                        {/* FIXED DELETE BUTTON - RED BORDER, VISIBLE BUTTON */}
+                                        <span className={`flex-1 font-medium text-sm md:text-base ${t.done ? 'line-through decoration-2' : ''}`}>{t.text}</span>
                                         <button 
                                             onClick={(e) => { e.stopPropagation(); setTodos(todos.filter(x => x.id !== t.id)); }} 
-                                            className="w-8 h-8 rounded-lg border border-red-200 bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white hover:border-red-500 transition-all shadow-sm"
-                                            title="Delete Task"
+                                            className="w-8 h-8 rounded-lg border border-red-200 bg-red-50 text-red-500 flex items-center justify-center active:bg-red-500 active:text-white transition-all shadow-sm"
                                         >
                                             <Icon name="trash-2" size={16} />
                                         </button>
@@ -683,23 +704,23 @@
             const addMilestone = (pid) => { const m = prompt("Milestone:"); if(m) updateProject(pid, p => { const nM = [...p.milestones, {id:Date.now(), text:m, done:false}]; return {...p, milestones: nM, progress: Math.round((nM.filter(x=>x.done).length/nM.length)*100)};}); };
             
             return (
-                <div className="max-w-5xl mx-auto pt-12 pb-32 px-6 animate-soft-rise">
-                    <div className="flex justify-between items-end mb-12 border-b border-black/5 pb-6">
-                        <h2 className="font-display font-bold text-4xl text-aether-dark">Projects</h2>
-                        <button onClick={() => {const t=prompt("Title:"); if(t) setProjects([...projects, {id:Date.now(), title:t, category:'General', progress:0, milestones:[]}])}} className={STYLES.BTN_ACCENT}><Icon name="plus" size={16} /> Create Project</button>
+                <div className="max-w-5xl mx-auto pt-8 md:pt-12 pb-32 px-4 md:px-6 animate-soft-rise">
+                    <div className="flex justify-between items-end mb-8 md:mb-12 border-b border-black/5 pb-4 md:pb-6">
+                        <h2 className="font-display font-bold text-3xl md:text-4xl text-aether-dark">Projects</h2>
+                        <button onClick={() => {const t=prompt("Title:"); if(t) setProjects([...projects, {id:Date.now(), title:t, category:'General', progress:0, milestones:[]}])}} className={STYLES.BTN_ACCENT}><Icon name="plus" size={16} /> <span className="hidden md:inline">Create Project</span></button>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                         {projects.map(p => (
-                            <div key={p.id} className="aerogel-card p-8 group">
+                            <div key={p.id} className="aerogel-card p-6 md:p-8 group">
                                 <div className="flex justify-between items-start mb-6">
-                                    <span onClick={() => editDetail(p.id, 'category', p.category)} className="px-3 py-1 rounded-full bg-gray-100 text-xs font-bold uppercase tracking-wider text-aether-muted hover:bg-aether-dark hover:text-white cursor-pointer transition-colors">{p.category}</span>
+                                    <span onClick={() => editDetail(p.id, 'category', p.category)} className="px-3 py-1 rounded-full bg-gray-100 text-xs font-bold uppercase tracking-wider text-aether-muted active:bg-aether-dark active:text-white cursor-pointer transition-colors">{p.category}</span>
                                     <div className="flex gap-2">
                                         <button onClick={() => editDetail(p.id, 'title', p.title)} className="btn-control"><Icon name="pencil" size={12} /> Edit</button>
                                         <button onClick={() => confirm("Delete?") && setProjects(projects.filter(x=>x.id!==p.id))} className="btn-control danger text-red-500 border-red-100"><Icon name="trash" size={12} /></button>
                                     </div>
                                 </div>
                                 <div className="mb-8">
-                                    <h3 className="font-display font-bold text-3xl text-aether-dark mb-2">{p.title}</h3>
+                                    <h3 className="font-display font-bold text-2xl md:text-3xl text-aether-dark mb-2">{p.title}</h3>
                                     <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
                                         <div className="h-full bg-aether-leaf transition-all duration-700 ease-out rounded-full" style={{width: `${p.progress}%`}}></div>
                                     </div>
@@ -707,12 +728,12 @@
                                 </div>
                                 <div className="space-y-3">
                                     {p.milestones.map(m => (
-                                        <div key={m.id} onClick={() => toggleMilestone(p.id, m.id)} className="flex items-center justify-between p-3 rounded-xl hover:bg-white transition-colors cursor-pointer group/item border border-transparent hover:border-gray-100">
+                                        <div key={m.id} onClick={() => toggleMilestone(p.id, m.id)} className="flex items-center justify-between p-3 rounded-xl hover:bg-white active:bg-white transition-colors cursor-pointer group/item border border-transparent hover:border-gray-100">
                                             <div className="flex gap-4 items-center flex-1">
                                                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${m.done ? 'bg-aether-secondary border-aether-secondary scale-90' : 'border-gray-300'}`}>
                                                     {m.done && <Icon name="check" size={10} className="text-white" strokeWidth={4} />}
                                                 </div>
-                                                <span className={`font-medium transition-all ${m.done ? 'text-gray-400 line-through' : 'text-aether-dark'}`}>{m.text}</span>
+                                                <span className={`font-medium transition-all text-sm md:text-base ${m.done ? 'text-gray-400 line-through' : 'text-aether-dark'}`}>{m.text}</span>
                                             </div>
                                             <button onClick={(e) => {e.stopPropagation(); updateProject(p.id, pr => ({...pr, milestones: pr.milestones.filter(x=>x.id!==m.id)}))}} className="btn-control h-7 w-7 !p-0 !rounded-full text-gray-400 hover:text-red-500"><Icon name="x" size={14} /></button>
                                         </div>
@@ -731,7 +752,7 @@
             const [xp, setXp] = useState(0);
             const [now, setNow] = useState(new Date());
             
-            // INITIAL DATA (Seeded with Today's Date)
+            // INITIAL DATA
             const todayStr = toISODate(new Date());
             const [schedule, setSchedule] = useState([
                 {id:'1',title:'Morning Flow',duration:1,date: todayStr,startHour:8},
@@ -746,7 +767,7 @@
             const gainXp = (am) => { 
                 setXp(p => { 
                     const n = p + am; 
-                    if(Math.floor(n/100) > Math.floor(p/100)) { confetti({colors:['#FF4F00', '#0066CC', '#E8E0D5']}); } 
+                    if(Math.floor(n/100) > Math.floor(p/100)) { confetti({colors:['#FF4F00', '#0066CC', '#E8E0D5'], zIndex: 100}); } 
                     return n; 
                 }) 
             };
