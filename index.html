@@ -204,10 +204,7 @@
     const addDays = (date, days) => { const d = new Date(date); d.setDate(d.getDate()+days); return d; };
     const clamp = (n,a,b)=> Math.max(a, Math.min(b,n));
     const fmtDow = (d) => ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"][((d.getDay()+6)%7)];
-    const fmtShort = (iso) => {
-      const d = parseISO(iso);
-      return `${fmtDow(d)} ${String(d.getDate()).padStart(2,"0")}`;
-    };
+    const fmtShort = (iso) => { const d = parseISO(iso); return `${fmtDow(d)} ${String(d.getDate()).padStart(2,"0")}`; };
     const startOfWeek = (date) => {
       const d = new Date(date);
       const day = d.getDay();
@@ -281,12 +278,10 @@
     function normalizeFocus(store){
       const n = deepClone(store);
       n.focus = n.focus || {};
-      // migrate old key
       if (typeof n.focus.durationMin === "number" && typeof n.focus.focusMin !== "number") {
         n.focus.focusMin = n.focus.durationMin;
       }
       n.focus = { ...DEFAULT_FOCUS, ...n.focus };
-      // sanitize
       n.focus.focusMin = clamp(Number(n.focus.focusMin || 25), 5, 180);
       n.focus.breakMin = clamp(Number(n.focus.breakMin || 5), 1, 60);
       if (!["FOCUS","BREAK"].includes(n.focus.mode)) n.focus.mode = "FOCUS";
@@ -468,12 +463,32 @@
       );
     };
 
+    // Centered modal that never "jumps" (locks body scroll + keeps scrollbar gap)
     function Modal({ open, title, subtitle, children, onClose, widthClass="max-w-lg" }){
+      useEffect(()=>{
+        if(!open) return;
+        const prevOverflow = document.body.style.overflow;
+        const prevPad = document.body.style.paddingRight;
+
+        const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
+        document.body.style.overflow = "hidden";
+        if(scrollBarWidth > 0) document.body.style.paddingRight = `${scrollBarWidth}px`;
+
+        return ()=>{
+          document.body.style.overflow = prevOverflow;
+          document.body.style.paddingRight = prevPad;
+        };
+      }, [open]);
+
       if(!open) return null;
+
       return (
-        <div className="fixed inset-0 z-[9998] flex items-center justify-center px-4 py-8">
+        <div className="fixed inset-0 z-[9998] grid place-items-center p-4">
           <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={onClose}></div>
-          <div className={`relative w-full ${widthClass} aerogel-card p-6 md:p-7`}>
+          <div
+            className={`relative w-full ${widthClass} aerogel-card p-6 md:p-7`}
+            style={{ transform: "translateZ(0)" }}
+          >
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
                 <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted">{subtitle || APP_NAME}</div>
@@ -556,7 +571,7 @@
           n.focus.remainingSec = null;
           return n;
         });
-        toast(f.running ? "Resumed." : "Started.");
+        toast("Started.");
       };
 
       const pause = ()=>{
@@ -616,7 +631,6 @@
         });
       };
 
-      // Circular ring
       const r = 46, cx = 60, cy = 60;
       const circ = 2*Math.PI*r;
       const dash = circ * progress;
@@ -718,7 +732,7 @@
                 </div>
 
                 <div className="text-aether-muted font-medium text-sm">
-                  Engineered behavior: pause preserves remaining time, auto-switch optionally chains Focus → Break → Focus.
+                  Pause preserves remaining time. Auto-switch optionally chains Focus → Break → Focus.
                 </div>
               </div>
             </div>
@@ -742,8 +756,7 @@
                   {APP_NAME}
                 </h1>
                 <p className="text-aether-muted mt-4 text-base md:text-lg max-w-2xl">
-                  Habits month grid, week/today pages, tasks embedded in Today, dashboard insights + optimized focus clock.
-                  Stored locally (prototype).
+                  Dashboard insights + engineered Today (habits + tasks + focus + notes). Stored locally (prototype).
                 </p>
 
                 <div className="mt-8 flex flex-wrap gap-3">
@@ -764,7 +777,7 @@
                   <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-aether-accent"></span> Signup / Login</li>
                   <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-aether-secondary"></span> Habit month grid + editor</li>
                   <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-aether-leaf"></span> Week + Today pages</li>
-                  <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-aether-sand"></span> Today: tasks board + notes + focus</li>
+                  <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-aether-sand"></span> Today: tasks board + habits board + focus + notes</li>
                 </ul>
               </div>
             </div>
@@ -876,7 +889,7 @@
       );
     }
 
-    // ---- Sidebar (order you requested) ----
+    // ---- Sidebar (order requested) ----
     function Sidebar({ route, go, userName, onLogout }) {
       const items = [
         { id: "dashboard", label: "Dashboard", icon: "layout-grid" },
@@ -981,7 +994,7 @@
       );
     }
 
-    // ---- Dashboard ----
+    // ---- Dashboard (removed Today tasks + habit quick toggles) ----
     function Dashboard({ store, setStore, goApp }){
       const today = toISODate(new Date());
 
@@ -994,35 +1007,6 @@
       const wk0 = startOfWeek(new Date());
       const weekDates = Array.from({length:7}, (_,i)=> toISODate(addDays(wk0,i)));
       const weekAvg = weekDates.reduce((a,d)=> a + dayOverallPct(store,d), 0) / weekDates.length;
-
-      const active = activeHabits(store);
-      const tasksToday = tasksForDate(store, today);
-
-      const toggleHabit = (hid)=>{
-        setStore(prev=> setHabitDone(prev, today, hid, !getHabitDone(prev, today, hid)));
-        toast("Habit updated.");
-      };
-
-      const toggleTask = (tid)=>{
-        setStore(prev=>{
-          const n = deepClone(prev);
-          const t = n.tasks.find(x=>x.id===tid);
-          if(t) t.status = (t.status==="DONE") ? "OPEN" : "DONE";
-          return n;
-        });
-        toast("Task updated.");
-      };
-
-      const addTask = ()=>{
-        const title = prompt("Task title:");
-        if(!title || !title.trim()) return;
-        setStore(prev=>{
-          const n = deepClone(prev);
-          n.tasks.push({ id: crypto.randomUUID(), title: title.trim(), dueDate: today, status:"OPEN", priority:"MED" });
-          return n;
-        });
-        toast("Task added.");
-      };
 
       const daily = sum.daily || [];
 
@@ -1144,83 +1128,19 @@
           </div>
 
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-            <div className="xl:col-span-2 space-y-6">
-              <div className="aerogel-card p-6 md:p-8">
-                <div className="flex items-center justify-between gap-4">
-                  <div>
-                    <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted">Habits today</div>
-                    <div className="font-display font-bold text-2xl text-aether-dark mt-2">Quick toggles</div>
-                  </div>
-                  <button className="btn-control" onClick={()=>goApp("habits")}><Icon name="grid-3x3" /> Manage</button>
-                </div>
-
-                <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {active.map(h=>{
-                    const done = getHabitDone(store, today, h.id);
-                    return (
-                      <button
-                        key={h.id}
-                        onClick={()=>toggleHabit(h.id)}
-                        className={`aerogel-card p-4 text-left flex items-center justify-between gap-4 active:scale-[0.99] transition-transform
-                          ${done ? "bg-aether-dark text-white border-white/10" : "bg-white/50"}
-                        `}
-                      >
-                        <div className="min-w-0">
-                          <div className="font-extrabold text-sm truncate">{h.title}</div>
-                          <div className={`text-[11px] font-black uppercase tracking-[0.14em] ${done ? "text-white/70" : "text-aether-muted"}`}>{h.category}</div>
-                        </div>
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center border shadow-sm ${
-                          done ? "bg-white/10 border-white/10" : "bg-white border-white/60"
-                        }`}>
-                          <Icon name={done ? "check" : "circle"} size={18} className={done ? "text-white" : "text-aether-dark"} />
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="aerogel-card p-6 md:p-8">
-                <div className="flex items-center justify-between gap-4">
-                  <div>
-                    <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted">Tasks</div>
-                    <div className="font-display font-bold text-2xl text-aether-dark mt-2">Today list</div>
-                  </div>
-                  <button className="btn-control" onClick={()=>goApp("today", today)}><Icon name="arrow-right" /> Open Today board</button>
-                </div>
-
-                <div className="mt-5 space-y-2">
-                  {tasksToday.length === 0 && <div className="text-aether-muted font-semibold">No tasks for today.</div>}
-                  {tasksToday.map(t=>(
-                    <button
-                      key={t.id}
-                      onClick={()=>toggleTask(t.id)}
-                      className={`w-full aerogel-card p-4 flex items-center justify-between gap-4 text-left active:scale-[0.99] transition-transform
-                        ${t.status==="DONE" ? "opacity-50 bg-white/30" : "bg-white/60"}
-                      `}
-                    >
-                      <div className="min-w-0">
-                        <div className="font-extrabold text-sm truncate">{t.title}</div>
-                        <div className="text-[11px] font-black uppercase tracking-[0.14em] text-aether-muted">Priority {t.priority} • {t.status}</div>
-                      </div>
-                      <div className="w-10 h-10 rounded-xl bg-white border border-white/60 shadow-sm flex items-center justify-center">
-                        <Icon name={t.status==="DONE" ? "check" : "circle"} size={18} />
-                      </div>
-                    </button>
-                  ))}
-                  <button className="btn-control w-full mt-3" onClick={addTask}><Icon name="plus" /> Add task (today)</button>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-6">
+            <div className="xl:col-span-2">
               <FocusClock store={store} setStore={setStore} />
+            </div>
+            <div className="space-y-6">
               <div className="aerogel-card p-6 md:p-8">
                 <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted">Rule</div>
                 <div className="font-display font-bold text-2xl text-aether-dark mt-2">One win first.</div>
                 <p className="text-aether-muted font-medium mt-3">
                   Finish one meaningful block before adding more.
                 </p>
+                <button className="btn-control w-full mt-4" onClick={()=>goApp("today", today)}>
+                  <Icon name="arrow-right" /> Go to Today
+                </button>
               </div>
             </div>
           </div>
@@ -1455,7 +1375,7 @@
       );
     }
 
-    // ---- Week (updated to open Today) ----
+    // ---- Week (unchanged) ----
     function Week({ store, goApp }){
       const [ref, setRef] = useState(()=> new Date());
       const w0 = useMemo(()=> startOfWeek(ref), [ref]);
@@ -1550,7 +1470,7 @@
       );
     }
 
-    // ---- TODAY (engineered: tasks merged + edit modal + focus + habits + notes) ----
+    // ---- TODAY (Habits moved to main column like tasks; removed header Add Task; removed scope buttons) ----
     function Today({ store, setStore, dateISO }){
       const date = dateISO || toISODate(new Date());
       const active = activeHabits(store);
@@ -1558,8 +1478,7 @@
       const [note, setNote] = useState(()=> store.notesByDate?.[date] || "");
       useEffect(()=>{ setNote(store.notesByDate?.[date] || ""); }, [date]);
 
-      // Tasks board state
-      const [scope, setScope] = useState("TODAY"); // TODAY | UPCOMING | ALL
+      // Tasks
       const [q, setQ] = useState("");
       const [openTaskModal, setOpenTaskModal] = useState(false);
       const [taskEdit, setTaskEdit] = useState(null);
@@ -1636,15 +1555,12 @@
         toast("Note saved.");
       };
 
+      const todayTasks = tasksForDate(store, date);
+      const openCount = todayTasks.filter(t=>t.status==="OPEN").length;
+      const doneCount = todayTasks.filter(t=>t.status==="DONE").length;
+
       const filteredTasks = useMemo(()=>{
-        const all = [...store.tasks];
-        const after = all.filter(t => (t.dueDate || "") > date);
-        const today = all.filter(t => t.dueDate === date);
-
-        let base = all;
-        if(scope==="TODAY") base = today;
-        if(scope==="UPCOMING") base = after;
-
+        let base = todayTasks;
         if(q.trim()){
           const s = q.trim().toLowerCase();
           base = base.filter(t =>
@@ -1654,14 +1570,9 @@
             (t.status||"").toLowerCase().includes(s)
           );
         }
-
-        base.sort((a,b)=> (a.dueDate||"").localeCompare(b.dueDate||"") || (a.status||"").localeCompare(b.status||"") || (a.title||"").localeCompare(b.title||""));
+        base = [...base].sort((a,b)=> (a.status||"").localeCompare(b.status||"") || (a.priority||"").localeCompare(b.priority||"") || (a.title||"").localeCompare(b.title||""));
         return base;
-      }, [store.tasks, scope, q, date]);
-
-      const todayTasks = tasksForDate(store, date);
-      const openCount = todayTasks.filter(t=>t.status==="OPEN").length;
-      const doneCount = todayTasks.filter(t=>t.status==="DONE").length;
+      }, [todayTasks, q]);
 
       const hp = dayHabitPct(store, date);
       const tp = dayTaskPct(store, date);
@@ -1678,10 +1589,11 @@
                   {date}
                 </h1>
                 <p className="text-aether-muted font-medium mt-3">
-                  One page. Habits + tasks + focus + notes. Engineered for execution.
+                  One page. Habits + tasks + focus + notes.
                 </p>
               </div>
 
+              {/* REMOVED: Add Task button from header */}
               <div className="flex items-center gap-3 flex-wrap">
                 <div className="aerogel-card px-4 py-3 bg-white/55">
                   <Donut pct={op} />
@@ -1690,45 +1602,76 @@
                   <div className="text-[10px] font-black uppercase tracking-[0.14em] text-aether-muted">Tasks</div>
                   <div className="font-display font-bold text-2xl">{doneCount}/{todayTasks.length}</div>
                 </div>
-                <button className="btn-control" onClick={openAddTask}><Icon name="plus" /> Add task</button>
               </div>
             </div>
           </div>
 
           <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_420px] gap-6 items-start">
-            {/* LEFT: Tasks board */}
+            {/* LEFT: Habits board + Tasks board (same prominence) */}
             <div className="space-y-6">
               <div className="aerogel-card p-6 md:p-8">
                 <div className="flex items-center justify-between gap-4 flex-wrap">
                   <div>
+                    <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted">Habits board</div>
+                    <div className="font-display font-bold text-2xl text-aether-dark mt-2">Checklist</div>
+                    <div className="text-aether-muted font-medium mt-2">Active habits only.</div>
+                  </div>
+                  <Pill><Icon name="check" size={14} /> {hp.toFixed(0)}%</Pill>
+                </div>
+
+                <div className="mt-5 space-y-2">
+                  {active.length===0 && (
+                    <div className="text-aether-muted font-semibold">No active habits. Turn some on in Habits.</div>
+                  )}
+                  {active.map(h=>{
+                    const done = getHabitDone(store, date, h.id);
+                    return (
+                      <button
+                        key={h.id}
+                        onClick={()=>toggleHabit(h.id)}
+                        className={`w-full aerogel-card p-4 text-left flex items-center justify-between gap-4 active:scale-[0.99] transition-transform
+                          ${done ? "bg-aether-dark text-white border-white/10" : "bg-white/55"}
+                        `}
+                      >
+                        <div className="min-w-0">
+                          <div className="font-extrabold text-sm truncate">{h.title}</div>
+                          <div className={`text-[11px] font-black uppercase tracking-[0.14em] ${done ? "text-white/70" : "text-aether-muted"}`}>{h.category}</div>
+                        </div>
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center border shadow-sm ${
+                          done ? "bg-white/10 border-white/10" : "bg-white border-white/60"
+                        }`}>
+                          <Icon name={done ? "check" : "circle"} size={18} className={done ? "text-white" : "text-aether-dark"} />
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="aerogel-card p-6 md:p-8">
+                <div className="flex items-center justify-between gap-4 flex-wrap">
+                  <div>
                     <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted">Tasks board</div>
-                    <div className="font-display font-bold text-2xl text-aether-dark mt-2">Execution queue</div>
+                    <div className="font-display font-bold text-2xl text-aether-dark mt-2">Today queue</div>
                     <div className="text-aether-muted font-medium mt-2">
-                      Today: <span className="font-bold text-aether-dark">{openCount}</span> open • <span className="font-bold text-aether-dark">{doneCount}</span> done
+                      <span className="font-bold text-aether-dark">{openCount}</span> open • <span className="font-bold text-aether-dark">{doneCount}</span> done
                     </div>
                   </div>
 
-                  <div className="flex gap-2 flex-wrap">
-                    <button className={`btn-control ${scope==="TODAY" ? "bg-aether-dark text-white border-white/10 hover:bg-aether-dark" : ""}`} onClick={()=>setScope("TODAY")}>
-                      Today
-                    </button>
-                    <button className={`btn-control ${scope==="UPCOMING" ? "bg-aether-dark text-white border-white/10 hover:bg-aether-dark" : ""}`} onClick={()=>setScope("UPCOMING")}>
-                      Upcoming
-                    </button>
-                    <button className={`btn-control ${scope==="ALL" ? "bg-aether-dark text-white border-white/10 hover:bg-aether-dark" : ""}`} onClick={()=>setScope("ALL")}>
-                      All
-                    </button>
-                  </div>
+                  {/* ONLY Add button stays here */}
+                  <button className="btn-control" onClick={openAddTask}><Icon name="plus" /> Add task</button>
                 </div>
 
                 <div className="mt-4 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3 items-center">
-                  <input className="input-glass" value={q} onChange={e=>setQ(e.target.value)} placeholder="Search tasks (title/date/status/priority)..." />
+                  <input className="input-glass" value={q} onChange={e=>setQ(e.target.value)} placeholder="Search today tasks..." />
                   <button className="btn-control" onClick={openAddTask}><Icon name="plus" /> Add</button>
                 </div>
 
                 <div className="mt-5 space-y-2">
                   {filteredTasks.length === 0 && (
-                    <div className="text-aether-muted font-semibold">No tasks match this view.</div>
+                    <div className="text-aether-muted font-semibold">
+                      {todayTasks.length === 0 ? "No tasks for today." : "No tasks match your search."}
+                    </div>
                   )}
 
                   {filteredTasks.map(t=>(
@@ -1771,48 +1714,9 @@
               </div>
             </div>
 
-            {/* RIGHT: Focus + Habits + Notes */}
+            {/* RIGHT: Focus + Notes */}
             <div className="space-y-6">
               <FocusClock store={store} setStore={setStore} />
-
-              <div className="aerogel-card p-6 md:p-8">
-                <div className="flex items-center justify-between gap-4 flex-wrap">
-                  <div>
-                    <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted">Habits</div>
-                    <div className="font-display font-bold text-2xl text-aether-dark mt-2">Checklist</div>
-                    <div className="text-aether-muted font-medium mt-2">Active habits only.</div>
-                  </div>
-                  <Pill><Icon name="check" size={14} /> {hp.toFixed(0)}%</Pill>
-                </div>
-
-                <div className="mt-5 space-y-2">
-                  {active.length===0 && (
-                    <div className="text-aether-muted font-semibold">No active habits. Turn some on in Habits.</div>
-                  )}
-                  {active.map(h=>{
-                    const done = getHabitDone(store, date, h.id);
-                    return (
-                      <button
-                        key={h.id}
-                        onClick={()=>toggleHabit(h.id)}
-                        className={`w-full aerogel-card p-4 text-left flex items-center justify-between gap-4 active:scale-[0.99] transition-transform
-                          ${done ? "bg-aether-dark text-white border-white/10" : "bg-white/55"}
-                        `}
-                      >
-                        <div className="min-w-0">
-                          <div className="font-extrabold text-sm truncate">{h.title}</div>
-                          <div className={`text-[11px] font-black uppercase tracking-[0.14em] ${done ? "text-white/70" : "text-aether-muted"}`}>{h.category}</div>
-                        </div>
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center border shadow-sm ${
-                          done ? "bg-white/10 border-white/10" : "bg-white border-white/60"
-                        }`}>
-                          <Icon name={done ? "check" : "circle"} size={18} className={done ? "text-white" : "text-aether-dark"} />
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
 
               <div className="aerogel-card p-6 md:p-8">
                 <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted">Notes</div>
@@ -1878,7 +1782,7 @@
       );
     }
 
-    // ---- Settings ----
+    // ---- Settings (unchanged) ----
     function Settings({ store, setStore }){
       const [name, setName] = useState(store.profile?.name || "User");
       const [blob, setBlob] = useState("");
