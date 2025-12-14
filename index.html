@@ -1,799 +1,2097 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Samir OS - Mobile Adapted</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/lucide@0.263.1"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Momentum System — Aether</title>
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        aether: {
-                            bg: '#F5F5F7',
-                            glass: 'rgba(255, 255, 255, 0.75)',
-                            dark: '#1D1D1F',
-                            muted: '#86868B',
-                            accent: '#FF4F00',
-                            secondary: '#0066CC',
-                            sand: '#E8E0D5',
-                            leaf: '#95C623'
-                        }
-                    },
-                    fontFamily: { 
-                        sans: ['Inter', 'sans-serif'], 
-                        display: ['Syne', 'sans-serif'] 
-                    },
-                    animation: { 
-                        'soft-rise': 'softRise 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards'
-                    },
-                    keyframes: { 
-                        softRise: { from: { opacity: 0, transform: 'translateY(20px)' }, to: { opacity: 1, transform: 'translateY(0)' } }
-                    }
-                }
+  <!-- Tailwind + React -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Icons + Confetti -->
+  <script src="https://unpkg.com/lucide@0.263.1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            aether: {
+              bg: '#F5F5F7',
+              glass: 'rgba(255, 255, 255, 0.75)',
+              dark: '#1D1D1F',
+              muted: '#86868B',
+              accent: '#FF4F00',
+              secondary: '#0066CC',
+              sand: '#E8E0D5',
+              leaf: '#95C623'
             }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Syne', 'sans-serif']
+          },
+          animation: {
+            'soft-rise': 'softRise 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards'
+          },
+          keyframes: {
+            softRise: {
+              from: { opacity: 0, transform: 'translateY(16px)' },
+              to: { opacity: 1, transform: 'translateY(0)' }
+            }
+          }
         }
-    </script>
+      }
+    }
+  </script>
 
-    <style>
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: #F5F5F7; 
-            color: #1D1D1F; 
-            overflow-x: hidden; /* Prevent side scroll on body */
-            -webkit-tap-highlight-color: transparent;
-        }
+  <style>
+    :root { --glass: rgba(255,255,255,0.75); }
+    body{
+      font-family:'Inter',sans-serif;
+      background:#F5F5F7;
+      color:#1D1D1F;
+      overflow-x:hidden;
+      -webkit-tap-highlight-color:transparent;
+    }
 
-        /* --- FALLING ELEMENTS ANIMATION --- */
-        .falling-container {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: -1;
-            overflow: hidden;
-        }
-        
-        .petal {
-            position: absolute;
-            top: -10%;
-            width: 15px;
-            height: 15px;
-            background: #E8E0D5;
-            border-radius: 100% 0 100% 0;
-            animation: fall linear infinite;
-            opacity: 0.6;
-        }
+    html { scroll-behavior: smooth; }
+    .nav-enter{
+      animation: navEnter 220ms cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: transform, opacity;
+    }
+    @keyframes navEnter{
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @media (prefers-reduced-motion: reduce){
+      html { scroll-behavior: auto; }
+      .nav-enter { animation: none; }
+    }
 
-        .leaf-particle {
-            position: absolute;
-            top: -10%;
-            width: 12px;
-            height: 20px;
-            background: #95C623;
-            border-radius: 0 50% 0 50%;
-            animation: fall linear infinite;
-            opacity: 0.5;
-        }
+    .falling-container{
+      position:fixed; top:0; left:0; width:100%; height:100%;
+      pointer-events:none; z-index:-1; overflow:hidden;
+    }
+    .petal{
+      position:absolute; top:-10%;
+      width:15px; height:15px;
+      background:#E8E0D5;
+      border-radius:100% 0 100% 0;
+      animation: fall linear infinite;
+      opacity:.55;
+    }
+    .leaf-particle{
+      position:absolute; top:-10%;
+      width:12px; height:20px;
+      background:#95C623;
+      border-radius:0 50% 0 50%;
+      animation: fall linear infinite;
+      opacity:.45;
+    }
+    @keyframes fall{
+      0%{ transform:translate(0,0) rotate(0deg); opacity:0; }
+      10%{ opacity:.75; }
+      100%{ transform:translate(100px,110vh) rotate(720deg); opacity:0; }
+    }
+    .p1{ left:10%; animation-duration:10s; animation-delay:0s; }
+    .p2{ left:20%; animation-duration:14s; animation-delay:2s; background:#F2EBE0; }
+    .p3{ left:35%; animation-duration:12s; animation-delay:4s; }
+    .p4{ left:50%; animation-duration:18s; animation-delay:1s; width:20px;height:20px; }
+    .p5{ left:65%; animation-duration:13s; animation-delay:3s; background:#F8F4ED; }
+    .p6{ left:80%; animation-duration:16s; animation-delay:5s; }
+    .p7{ left:90%; animation-duration:11s; animation-delay:0s; }
+    .l1{ left:15%; animation-duration:15s; animation-delay:1s; }
+    .l2{ left:40%; animation-duration:12s; animation-delay:6s; }
+    .l3{ left:75%; animation-duration:19s; animation-delay:2s; }
+    @media (max-width:768px){ .p2,.p4,.p6,.l2{ display:none; } }
 
-        @keyframes fall {
-            0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.8; }
-            100% { transform: translate(100px, 110vh) rotate(720deg); opacity: 0; }
-        }
+    .aerogel-card{
+      background:var(--glass);
+      backdrop-filter:blur(20px);
+      -webkit-backdrop-filter:blur(20px);
+      border:1px solid rgba(255,255,255,0.8);
+      box-shadow:0 12px 34px -18px rgba(0,0,0,0.10);
+      border-radius:24px;
+      transition: box-shadow .25s ease;
+    }
 
-        .p1 { left: 10%; animation-duration: 10s; animation-delay: 0s; }
-        .p2 { left: 20%; animation-duration: 14s; animation-delay: 2s; background: #F2EBE0; }
-        .p3 { left: 35%; animation-duration: 12s; animation-delay: 4s; }
-        .p4 { left: 50%; animation-duration: 18s; animation-delay: 1s; width: 20px; height: 20px; }
-        .p5 { left: 65%; animation-duration: 13s; animation-delay: 3s; background: #F8F4ED; }
-        .p6 { left: 80%; animation-duration: 16s; animation-delay: 5s; }
-        .p7 { left: 90%; animation-duration: 11s; animation-delay: 0s; }
-        
-        .l1 { left: 15%; animation-duration: 15s; animation-delay: 1s; }
-        .l2 { left: 40%; animation-duration: 12s; animation-delay: 6s; }
-        .l3 { left: 75%; animation-duration: 19s; animation-delay: 2s; }
+    .btn-control{
+      background:white;
+      border:1px solid #E5E5E5;
+      color:#1D1D1F;
+      padding:10px 12px;
+      border-radius:12px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      font-size:11px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      box-shadow:0 2px 6px rgba(0,0,0,0.06);
+      transition:all .18s ease;
+      cursor:pointer;
+      user-select:none;
+    }
+    .btn-control:active{ transform:scale(.97); }
+    .btn-control:hover{
+      background:#FF4F00;
+      border-color:#FF4F00;
+      color:white;
+      box-shadow:0 10px 24px -18px rgba(255,79,0,0.55);
+    }
+    .btn-control.danger:hover{ background:#FF3B30; border-color:#FF3B30; }
 
-        /* Reduce particles on mobile for performance */
-        @media (max-width: 768px) {
-            .p2, .p4, .p6, .l2 { display: none; }
-        }
+    .btn-primary{ border-radius:999px; font-weight:950; }
+    .btn-primary:active{ transform:scale(.98); }
 
-        /* --- AEROGEL UI --- */
-        .aerogel-card {
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
-            border-radius: 24px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        /* Hover effects only on desktop to prevent stuck states on touch */
-        @media (min-width: 769px) {
-            .aerogel-card:hover { transform: translateY(-2px); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1); }
-        }
+    .input-glass{
+      width:100%;
+      background:white;
+      padding:14px 16px;
+      border:1px solid #E5E5E5;
+      border-radius:16px;
+      outline:none;
+      transition:all .18s ease;
+      font-weight:650;
+    }
+    .input-glass:focus{
+      border-color:#FF4F00;
+      box-shadow:0 12px 30px -18px rgba(255,79,0,0.30);
+    }
+    .label-small{
+      font-size:11px;
+      text-transform:uppercase;
+      font-weight:950;
+      letter-spacing:.14em;
+      color:#86868B;
+      display:block;
+      margin-bottom:8px;
+      padding-left:4px;
+    }
 
-        /* --- VISIBLE BUTTONS --- */
-        .btn-control {
-            background: white;
-            border: 1px solid #E5E5E5;
-            color: #1D1D1F;
-            padding: 8px 12px; /* Larger touch target */
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            transition: all 0.2s ease;
-            cursor: pointer;
-            opacity: 1 !important;
-        }
-        .btn-control:active {
-            transform: scale(0.95);
-        }
-        .btn-control:hover {
-            background: #FF4F00;
-            border-color: #FF4F00;
-            color: white;
-            box-shadow: 0 4px 10px rgba(255, 79, 0, 0.2);
-        }
-        .btn-control.danger:hover {
-            background: #FF3B30;
-            border-color: #FF3B30;
-        }
-
-        /* --- UTILS --- */
-        .btn-swiss { border-radius: 100px; font-weight: 600; transition: all 0.3s ease; }
-        .btn-swiss:active { transform: scale(0.96); }
-        .custom-scrollbar::-webkit-scrollbar { width: 0px; height: 0px; background: transparent; }
-        
-        /* Mobile Safe Area padding */
-        .safe-pb { padding-bottom: env(safe-area-inset-bottom); }
-    </style>
+    .custom-scrollbar::-webkit-scrollbar{ width:0px; height:0px; background:transparent; }
+  </style>
 </head>
+
 <body>
-    <div class="falling-container">
-        <div class="petal p1"></div>
-        <div class="petal p2"></div>
-        <div class="petal p3"></div>
-        <div class="petal p4"></div>
-        <div class="petal p5"></div>
-        <div class="petal p6"></div>
-        <div class="petal p7"></div>
-        <div class="leaf-particle l1"></div>
-        <div class="leaf-particle l2"></div>
-        <div class="leaf-particle l3"></div>
-    </div>
+  <div class="falling-container">
+    <div class="petal p1"></div><div class="petal p2"></div><div class="petal p3"></div>
+    <div class="petal p4"></div><div class="petal p5"></div><div class="petal p6"></div><div class="petal p7"></div>
+    <div class="leaf-particle l1"></div><div class="leaf-particle l2"></div><div class="leaf-particle l3"></div>
+  </div>
 
-    <div id="root"></div>
+  <div id="root"></div>
 
-    <script type="text/babel">
-        const { useState, useEffect, useMemo, memo } = React;
+  <script type="text/babel">
+    const { useEffect, useMemo, useState, memo } = React;
 
-        // --- HELPERS ---
-        const HOURS = Array.from({ length: 24 }, (_, i) => i);
-        const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-        const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        
-        const TASK_LIBRARY = [{ title: "Deep Work", duration: 2 }, { title: "Meeting", duration: 1 }, { title: "Gym", duration: 1 }, { title: "Study", duration: 2 }];
-        
-        const STYLES = {
-            BTN_PRIMARY: "btn-swiss bg-aether-dark text-white hover:bg-aether-accent hover:shadow-lg hover:shadow-aether-accent/30 px-6 py-3 flex items-center gap-3 shadow-xl shadow-black/5 transition-all w-full md:w-auto justify-center md:justify-start",
-            BTN_ACCENT: "btn-swiss bg-white text-aether-dark border border-black/5 hover:border-aether-accent hover:text-aether-accent shadow-sm px-5 py-2 flex items-center gap-2 text-sm transition-all",
-            INPUT_GLASS: "w-full bg-white p-4 text-aether-dark border border-gray-200 rounded-xl focus:border-aether-accent focus:shadow-lg focus:outline-none transition-all font-sans",
-            LABEL_SMALL: "text-[11px] uppercase font-bold text-aether-muted block mb-2 tracking-wider pl-1"
-        };
+    const APP_NAME = "Momentum System";
 
-        // Date Helpers
-        const toISODate = (d) => d.toISOString().split('T')[0];
-        const getStartOfWeek = (date) => {
-            const d = new Date(date);
-            const day = d.getDay();
-            const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-            return new Date(d.setDate(diff));
-        };
-        const addDays = (date, days) => { const d = new Date(date); d.setDate(d.getDate() + days); return d; };
-        
-        // Confetti
-        const triggerConfetti = () => confetti({ particleCount: 80, spread: 100, origin: { y: 0.6 }, colors: ['#FF4F00', '#0066CC', '#E8E0D5'] });
+    // ---- Utils ----
+    const deepClone = (obj) => (window.structuredClone ? structuredClone(obj) : JSON.parse(JSON.stringify(obj)));
+    const toISODate = (d) => new Date(d).toISOString().split("T")[0];
+    const parseISO = (s) => { const [y,m,da]=s.split("-").map(Number); return new Date(y,m-1,da); };
+    const addDays = (date, days) => { const d = new Date(date); d.setDate(d.getDate()+days); return d; };
+    const clamp = (n,a,b)=> Math.max(a, Math.min(b,n));
+    const fmtDow = (d) => ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"][((d.getDay()+6)%7)];
+    const fmtShort = (iso) => {
+      const d = parseISO(iso);
+      return `${fmtDow(d)} ${String(d.getDate()).padStart(2,"0")}`;
+    };
+    const startOfWeek = (date) => {
+      const d = new Date(date);
+      const day = d.getDay();
+      const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+      const out = new Date(d.setDate(diff));
+      out.setHours(0,0,0,0);
+      return out;
+    };
+    const monthDays = (date) => {
+      const y = date.getFullYear(), m = date.getMonth();
+      const last = new Date(y, m+1, 0).getDate();
+      return Array.from({length:last}, (_,i)=> new Date(y,m,i+1));
+    };
+    const monthLabel = (date) => date.toLocaleString(undefined, { month:"long", year:"numeric" });
 
-        const Icon = memo(({ name, size = 24, className = "" }) => {
-            if (!window.lucide?.icons) return null;
-            const iconName = name.split('-').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join('');
-            if (!window.lucide.icons[iconName]) return null;
-            const svg = window.lucide.icons[iconName].toSvg({ width: size, height: size, class: className });
-            return <span dangerouslySetInnerHTML={{ __html: svg }} className="inline-flex items-center justify-center" />;
+    const triggerConfetti = () => {
+      if(!window.confetti) return;
+      confetti({ particleCount: 70, spread: 95, origin: { y: 0.7 }, colors: ["#FF4F00", "#0066CC", "#E8E0D5"] });
+    };
+
+    const toast = (msg, type="ok") => {
+      const el = document.createElement("div");
+      el.className = "fixed left-1/2 -translate-x-1/2 bottom-6 z-[9999] aerogel-card px-4 py-3";
+      el.style.borderRadius = "18px";
+      el.innerHTML = `
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:10px;height:10px;border-radius:999px;background:${type==="err"?"#FF3B30":"#95C623"}"></div>
+          <div style="font-weight:950; font-size:12px; text-transform:uppercase; letter-spacing:.10em;">${type==="err"?"Error":"Saved"}</div>
+          <div style="color:#86868B; font-weight:700; font-size:13px;">${msg}</div>
+        </div>
+      `;
+      document.body.appendChild(el);
+      setTimeout(()=>{ el.remove(); }, 2100);
+    };
+
+    const Icon = memo(({ name, size=18, className="" }) => {
+      if (!window.lucide?.icons) return null;
+      const iconName = name.split("-").map(p => p.charAt(0).toUpperCase()+p.slice(1)).join("");
+      if (!window.lucide.icons[iconName]) return null;
+      const svg = window.lucide.icons[iconName].toSvg({ width: size, height: size, class: className });
+      return <span dangerouslySetInnerHTML={{ __html: svg }} className="inline-flex items-center justify-center" />;
+    });
+
+    // ---- LocalStorage Model ----
+    const LS = {
+      get(k, fallback=null){
+        try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fallback; }
+        catch { return fallback; }
+      },
+      set(k, v){ localStorage.setItem(k, JSON.stringify(v)); },
+      del(k){ localStorage.removeItem(k); }
+    };
+
+    const KEYS = {
+      users: "ms.users",
+      session: "ms.session",
+      data: (uid) => `ms.data.${uid}`
+    };
+
+    const DEFAULT_FOCUS = {
+      focusMin: 25,
+      breakMin: 5,
+      mode: "FOCUS",          // FOCUS | BREAK
+      running: false,
+      endsAt: null,           // ISO datetime when running
+      remainingSec: null,     // used when paused
+      cycles: 0,              // completed focus sessions
+      autoSwitch: true
+    };
+
+    function normalizeFocus(store){
+      const n = deepClone(store);
+      n.focus = n.focus || {};
+      // migrate old key
+      if (typeof n.focus.durationMin === "number" && typeof n.focus.focusMin !== "number") {
+        n.focus.focusMin = n.focus.durationMin;
+      }
+      n.focus = { ...DEFAULT_FOCUS, ...n.focus };
+      // sanitize
+      n.focus.focusMin = clamp(Number(n.focus.focusMin || 25), 5, 180);
+      n.focus.breakMin = clamp(Number(n.focus.breakMin || 5), 1, 60);
+      if (!["FOCUS","BREAK"].includes(n.focus.mode)) n.focus.mode = "FOCUS";
+      return n;
+    }
+
+    function defaultStore(name="User"){
+      const today = new Date();
+      return normalizeFocus({
+        profile: { name, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "local" },
+        habits: [
+          { id: crypto.randomUUID(), title:"Cold Shower", category:"Morning", active:true },
+          { id: crypto.randomUUID(), title:"Journal", category:"Morning", active:true },
+          { id: crypto.randomUUID(), title:"Gym", category:"Body", active:true },
+          { id: crypto.randomUUID(), title:"Study Block", category:"Work", active:true },
+          { id: crypto.randomUUID(), title:"Read 20 min", category:"Evening", active:true },
+        ],
+        habitLogs: {},
+        tasks: [
+          { id: crypto.randomUUID(), title:"Plan the week", dueDate: toISODate(today), status:"OPEN", priority:"MED" },
+          { id: crypto.randomUUID(), title:"One deep work block", dueDate: toISODate(today), status:"OPEN", priority:"HIGH" },
+        ],
+        notesByDate: {}
+      });
+    }
+
+    const Auth = {
+      me(){
+        const s = LS.get(KEYS.session, null);
+        if(!s?.userId) return null;
+        const users = LS.get(KEYS.users, []);
+        return users.find(u=>u.id===s.userId) || null;
+      },
+      signup({name, email, password}){
+        const users = LS.get(KEYS.users, []);
+        if(users.some(u => u.email.toLowerCase() === email.toLowerCase())) throw new Error("Email already exists.");
+        const id = crypto.randomUUID();
+        users.push({ id, name, email, password }); // prototype only
+        LS.set(KEYS.users, users);
+        LS.set(KEYS.session, { userId: id });
+        if(!LS.get(KEYS.data(id), null)) LS.set(KEYS.data(id), defaultStore(name));
+        return id;
+      },
+      login({email, password}){
+        const users = LS.get(KEYS.users, []);
+        const u = users.find(x => x.email.toLowerCase() === email.toLowerCase());
+        if(!u || u.password !== password) throw new Error("Invalid email or password.");
+        LS.set(KEYS.session, { userId: u.id });
+        if(!LS.get(KEYS.data(u.id), null)) LS.set(KEYS.data(u.id), defaultStore(u.name));
+        return u.id;
+      },
+      logout(){ LS.del(KEYS.session); }
+    };
+
+    const Data = {
+      load(uid){ return LS.get(KEYS.data(uid), null); },
+      save(uid, store){ LS.set(KEYS.data(uid), store); }
+    };
+
+    // ---- Stats Helpers ----
+    const activeHabits = (store) => store.habits.filter(h=>h.active);
+    const getHabitDone = (store, date, habitId) => !!(store.habitLogs?.[date]?.[habitId]);
+    const setHabitDone = (store, date, habitId, done) => {
+      const next = deepClone(store);
+      next.habitLogs = next.habitLogs || {};
+      next.habitLogs[date] = next.habitLogs[date] || {};
+      next.habitLogs[date][habitId] = done;
+      return next;
+    };
+
+    const tasksForDate = (store, date) => store.tasks.filter(t=>t.dueDate===date);
+
+    const dayHabitPct = (store, date) => {
+      const hs = activeHabits(store);
+      if(hs.length===0) return 0;
+      const done = hs.filter(h=>getHabitDone(store, date, h.id)).length;
+      return (done/hs.length)*100;
+    };
+
+    const dayTaskPct = (store, date) => {
+      const ts = tasksForDate(store, date);
+      if(ts.length===0) return 0;
+      const done = ts.filter(t=>t.status==="DONE").length;
+      return (done/ts.length)*100;
+    };
+
+    const dayOverallPct = (store, date) => (dayHabitPct(store,date) + dayTaskPct(store,date)) / 2;
+
+    const monthSummary = (store, refDate=new Date()) => {
+      const days = monthDays(refDate).map(toISODate);
+      const hs = activeHabits(store);
+      const totalPossible = hs.length * days.length;
+      let done = 0;
+      for(const d of days){
+        for(const h of hs){
+          if(getHabitDone(store,d,h.id)) done++;
+        }
+      }
+      const overall = totalPossible ? (done/totalPossible)*100 : 0;
+
+      const perHabit = hs.map(h=>{
+        const actual = days.filter(d=>getHabitDone(store,d,h.id)).length;
+        const goal = days.length;
+        return { habitId:h.id, title:h.title, goal, actual, pct: goal ? (actual/goal)*100 : 0 };
+      });
+
+      const daily = days.map(d=>({ date:d, pct: dayHabitPct(store,d) }));
+      return { overall, done, totalPossible, perHabit, daily, days };
+    };
+
+    // Best vs Weak WITHOUT overlap
+    const splitBestWeak = (perHabit, bestN = 3, weakN = 3) => {
+      const byBest = [...perHabit].sort(
+        (a, b) => (b.pct - a.pct) || a.title.localeCompare(b.title)
+      );
+      const best = byBest.slice(0, Math.min(bestN, byBest.length));
+      const bestIds = new Set(best.map(x => x.habitId));
+
+      const byWeak = [...perHabit]
+        .sort((a, b) => (a.pct - b.pct) || a.title.localeCompare(b.title))
+        .filter(x => !bestIds.has(x.habitId));
+
+      const weak = byWeak.slice(0, Math.min(weakN, byWeak.length));
+      return { best, weak };
+    };
+
+    // ---- Hash Router ----
+    function useHashRoute(){
+      const [hash, setHash] = useState(window.location.hash || "#/");
+      useEffect(()=>{
+        const on = ()=> setHash(window.location.hash || "#/");
+        window.addEventListener("hashchange", on);
+        return ()=> window.removeEventListener("hashchange", on);
+      },[]);
+      return { hash };
+    }
+
+    // ---- UI ----
+    const Pill = ({ children }) => (
+      <span className="px-3 py-1 rounded-full bg-white/70 border border-white/60 text-[11px] font-black uppercase tracking-[0.14em] text-aether-muted inline-flex items-center gap-2">
+        {children}
+      </span>
+    );
+
+    const ProgressBar = ({ label, pct }) => {
+      const v = clamp(pct,0,100);
+      return (
+        <div className="aerogel-card p-5">
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted">{label}</div>
+            <div className="font-display font-bold text-xl text-aether-dark">{v.toFixed(0)}%</div>
+          </div>
+          <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+            <div className="h-2 bg-aether-accent rounded-full transition-all" style={{ width: `${v}%` }} />
+          </div>
+        </div>
+      );
+    };
+
+    const Donut = ({ pct=0 }) => {
+      const p = clamp(pct,0,100);
+      const r = 20;
+      const c = 2*Math.PI*r;
+      const off = c - (p/100)*c;
+      return (
+        <div className="flex items-center gap-3">
+          <svg width="52" height="52" viewBox="0 0 60 60" className="drop-shadow-sm">
+            <circle cx="30" cy="30" r={r} stroke="rgba(0,0,0,0.08)" strokeWidth="7" fill="none"></circle>
+            <circle cx="30" cy="30" r={r} stroke="#FF4F00" strokeWidth="7" fill="none"
+              strokeDasharray={c} strokeDashoffset={off} strokeLinecap="round"
+              transform="rotate(-90 30 30)"
+            ></circle>
+          </svg>
+          <div>
+            <div className="font-display font-bold text-2xl text-aether-dark leading-none">{p.toFixed(0)}%</div>
+            <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted">Complete</div>
+          </div>
+        </div>
+      );
+    };
+
+    function Modal({ open, title, subtitle, children, onClose, widthClass="max-w-lg" }){
+      if(!open) return null;
+      return (
+        <div className="fixed inset-0 z-[9998] flex items-center justify-center px-4 py-8">
+          <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={onClose}></div>
+          <div className={`relative w-full ${widthClass} aerogel-card p-6 md:p-7`}>
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted">{subtitle || APP_NAME}</div>
+                <div className="font-display font-bold text-2xl text-aether-dark mt-2">{title}</div>
+              </div>
+              <button className="btn-control" onClick={onClose} title="Close"><Icon name="x" size={16} /></button>
+            </div>
+            <div className="mt-5">{children}</div>
+          </div>
+        </div>
+      );
+    }
+
+    // ---- Focus Clock (optimized) ----
+    function FocusClock({ store, setStore }){
+      const [tick, setTick] = useState(0);
+      useEffect(()=>{ const t=setInterval(()=>setTick(x=>x+1),500); return ()=>clearInterval(t); },[]);
+
+      const f = store.focus || DEFAULT_FOCUS;
+      const now = Date.now();
+      const totalSec = (f.mode === "FOCUS" ? f.focusMin : f.breakMin) * 60;
+
+      const endsAtMs = f.endsAt ? new Date(f.endsAt).getTime() : null;
+      const runningRemaining = (f.running && endsAtMs) ? Math.max(0, Math.ceil((endsAtMs - now)/1000)) : null;
+      const remaining = f.running ? (runningRemaining ?? totalSec) : (typeof f.remainingSec === "number" ? clamp(f.remainingSec, 0, totalSec) : totalSec);
+
+      const progress = totalSec ? clamp(1 - (remaining / totalSec), 0, 1) : 0;
+
+      useEffect(()=>{
+        if(f.running && endsAtMs && remaining === 0){
+          setStore(prev=>{
+            const n = normalizeFocus(prev);
+            const wasFocus = n.focus.mode === "FOCUS";
+            n.focus.running = false;
+            n.focus.endsAt = null;
+            n.focus.remainingSec = null;
+
+            if (wasFocus) n.focus.cycles = (n.focus.cycles || 0) + 1;
+
+            if(n.focus.autoSwitch){
+              n.focus.mode = wasFocus ? "BREAK" : "FOCUS";
+              const nextTotal = (n.focus.mode === "FOCUS" ? n.focus.focusMin : n.focus.breakMin) * 60;
+              n.focus.running = true;
+              n.focus.endsAt = new Date(Date.now() + nextTotal*1000).toISOString();
+            }
+            return n;
+          });
+          triggerConfetti();
+          toast("Session complete.");
+        }
+      }, [remaining]);
+
+      const mm = String(Math.floor(remaining/60)).padStart(2,'0');
+      const ss = String(remaining%60).padStart(2,'0');
+
+      const setFocusMin = (val)=>{
+        setStore(prev=>{
+          const n = normalizeFocus(prev);
+          n.focus.focusMin = clamp(Number(val), 5, 180);
+          if(!n.focus.running && n.focus.mode==="FOCUS") n.focus.remainingSec = null;
+          return n;
+        });
+      };
+      const setBreakMin = (val)=>{
+        setStore(prev=>{
+          const n = normalizeFocus(prev);
+          n.focus.breakMin = clamp(Number(val), 1, 60);
+          if(!n.focus.running && n.focus.mode==="BREAK") n.focus.remainingSec = null;
+          return n;
+        });
+      };
+
+      const startOrResume = ()=>{
+        setStore(prev=>{
+          const n = normalizeFocus(prev);
+          const total = (n.focus.mode === "FOCUS" ? n.focus.focusMin : n.focus.breakMin) * 60;
+          const rem = (typeof n.focus.remainingSec === "number") ? clamp(n.focus.remainingSec, 1, total) : total;
+          n.focus.running = true;
+          n.focus.endsAt = new Date(Date.now() + rem*1000).toISOString();
+          n.focus.remainingSec = null;
+          return n;
+        });
+        toast(f.running ? "Resumed." : "Started.");
+      };
+
+      const pause = ()=>{
+        setStore(prev=>{
+          const n = normalizeFocus(prev);
+          const total = (n.focus.mode === "FOCUS" ? n.focus.focusMin : n.focus.breakMin) * 60;
+          const e = n.focus.endsAt ? new Date(n.focus.endsAt).getTime() : null;
+          const rem = (n.focus.running && e) ? Math.max(0, Math.ceil((e - Date.now())/1000)) : total;
+          n.focus.running = false;
+          n.focus.endsAt = null;
+          n.focus.remainingSec = clamp(rem, 0, total);
+          return n;
+        });
+        toast("Paused.");
+      };
+
+      const reset = ()=>{
+        setStore(prev=>{
+          const n = normalizeFocus(prev);
+          n.focus.running = false;
+          n.focus.endsAt = null;
+          n.focus.remainingSec = null;
+          return n;
+        });
+        toast("Reset.");
+      };
+
+      const skip = ()=>{
+        setStore(prev=>{
+          const n = normalizeFocus(prev);
+          const wasFocus = n.focus.mode === "FOCUS";
+          n.focus.running = false;
+          n.focus.endsAt = null;
+          n.focus.remainingSec = null;
+          n.focus.mode = wasFocus ? "BREAK" : "FOCUS";
+          return n;
+        });
+        toast("Switched.");
+      };
+
+      const setMode = (mode)=>{
+        setStore(prev=>{
+          const n = normalizeFocus(prev);
+          n.focus.running = false;
+          n.focus.endsAt = null;
+          n.focus.remainingSec = null;
+          n.focus.mode = mode;
+          return n;
+        });
+      };
+
+      const toggleAuto = ()=>{
+        setStore(prev=>{
+          const n = normalizeFocus(prev);
+          n.focus.autoSwitch = !n.focus.autoSwitch;
+          return n;
+        });
+      };
+
+      // Circular ring
+      const r = 46, cx = 60, cy = 60;
+      const circ = 2*Math.PI*r;
+      const dash = circ * progress;
+      const dashOffset = circ - dash;
+
+      return (
+        <div className="aerogel-card p-6 md:p-8 relative overflow-hidden">
+          <div className="absolute -right-24 -top-24 w-60 h-60 bg-aether-secondary/10 rounded-full blur-3xl"></div>
+          <div className="relative z-10">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted flex items-center gap-2">
+                  <Icon name="zap" size={16} /> Focus clock
+                </div>
+                <div className="mt-2 flex items-center gap-2 flex-wrap">
+                  <button
+                    className={`btn-control ${f.mode==="FOCUS" ? "bg-aether-dark text-white border-white/10 hover:bg-aether-dark" : ""}`}
+                    onClick={()=>setMode("FOCUS")}
+                  >
+                    Focus
+                  </button>
+                  <button
+                    className={`btn-control ${f.mode==="BREAK" ? "bg-aether-dark text-white border-white/10 hover:bg-aether-dark" : ""}`}
+                    onClick={()=>setMode("BREAK")}
+                  >
+                    Break
+                  </button>
+                  <button className="btn-control" onClick={toggleAuto} title="Auto-switch after completion">
+                    <Icon name={f.autoSwitch ? "toggle-right" : "toggle-left"} size={16} /> Auto
+                  </button>
+                </div>
+              </div>
+
+              <div className="aerogel-card p-3 bg-white/55">
+                <div className="text-[10px] font-black uppercase tracking-[0.14em] text-aether-muted">Cycles</div>
+                <div className="font-display font-bold text-2xl text-aether-dark">{f.cycles || 0}</div>
+              </div>
+            </div>
+
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-[160px_minmax(0,1fr)] gap-5 items-center">
+              <div className="flex items-center justify-center">
+                <div className="relative">
+                  <svg width="120" height="120" viewBox="0 0 120 120" className="drop-shadow-sm">
+                    <circle cx={cx} cy={cy} r={r} stroke="rgba(0,0,0,0.08)" strokeWidth="10" fill="none"></circle>
+                    <circle
+                      cx={cx} cy={cy} r={r}
+                      stroke="#FF4F00"
+                      strokeWidth="10"
+                      fill="none"
+                      strokeDasharray={circ}
+                      strokeDashoffset={dashOffset}
+                      strokeLinecap="round"
+                      transform={`rotate(-90 ${cx} ${cy})`}
+                    ></circle>
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <div className="font-display font-bold text-3xl tabular-nums">{mm}:{ss}</div>
+                    <div className="text-[10px] font-black uppercase tracking-[0.14em] text-aether-muted mt-1">
+                      {f.mode === "FOCUS" ? "Focus" : "Break"}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div className="aerogel-card p-4 bg-white/55">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <div className="text-[10px] font-black uppercase tracking-[0.14em] text-aether-muted">Focus minutes</div>
+                      <div className="mt-2 flex gap-2 flex-wrap">
+                        {[25,45,60,90].map(x=>(
+                          <button key={x} className="btn-control" onClick={()=>setFocusMin(x)}>{x}m</button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-[10px] font-black uppercase tracking-[0.14em] text-aether-muted">Break minutes</div>
+                      <div className="mt-2 flex gap-2 flex-wrap">
+                        {[5,10,15].map(x=>(
+                          <button key={x} className="btn-control" onClick={()=>setBreakMin(x)}>{x}m</button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-2 flex-wrap">
+                  {!f.running ? (
+                    <button className="btn-control btn-primary bg-aether-dark text-white hover:bg-aether-accent px-6 py-3 flex-1 min-w-[160px]" onClick={startOrResume}>
+                      <Icon name="play" /> {typeof store.focus?.remainingSec === "number" ? "Resume" : "Start"}
+                    </button>
+                  ) : (
+                    <button className="btn-control btn-primary bg-aether-accent text-white px-6 py-3 flex-1 min-w-[160px]" onClick={pause}>
+                      <Icon name="pause" /> Pause
+                    </button>
+                  )}
+                  <button className="btn-control flex-1 min-w-[120px]" onClick={reset}><Icon name="rotate-ccw" /> Reset</button>
+                  <button className="btn-control flex-1 min-w-[120px]" onClick={skip}><Icon name="skip-forward" /> Skip</button>
+                </div>
+
+                <div className="text-aether-muted font-medium text-sm">
+                  Engineered behavior: pause preserves remaining time, auto-switch optionally chains Focus → Break → Focus.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ---- Landing/Auth ----
+    function Landing(){
+      return (
+        <div className="w-full max-w-none px-4 md:px-8 pt-10 md:pt-16 pb-16 animate-soft-rise">
+          <div className="aerogel-card p-6 md:p-10 relative overflow-hidden">
+            <div className="absolute -right-24 -top-24 w-72 h-72 bg-aether-sand/40 rounded-full blur-3xl"></div>
+            <div className="absolute -left-24 -bottom-24 w-72 h-72 bg-aether-secondary/10 rounded-full blur-3xl"></div>
+
+            <div className="relative z-10 grid grid-cols-1 md:grid-cols-[1fr_420px] gap-8 items-start">
+              <div>
+                <Pill><span className="w-2 h-2 rounded-full bg-aether-leaf animate-pulse"></span> Aether UI</Pill>
+                <h1 className="font-display font-bold text-4xl md:text-6xl text-aether-dark mt-4 tracking-tight">
+                  {APP_NAME}
+                </h1>
+                <p className="text-aether-muted mt-4 text-base md:text-lg max-w-2xl">
+                  Habits month grid, week/today pages, tasks embedded in Today, dashboard insights + optimized focus clock.
+                  Stored locally (prototype).
+                </p>
+
+                <div className="mt-8 flex flex-wrap gap-3">
+                  <a href="#/signup" className="btn-control btn-primary bg-aether-dark text-white hover:bg-aether-accent hover:shadow-lg hover:shadow-aether-accent/30 px-6 py-3">
+                    <Icon name="user-plus" /> Create account
+                  </a>
+                  <a href="#/login" className="btn-control px-6 py-3">
+                    <Icon name="log-in" /> Log in
+                  </a>
+                </div>
+              </div>
+
+              <div className="aerogel-card p-6 md:p-8 w-full">
+                <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted flex items-center gap-2">
+                  <Icon name="sparkles" size={16} /> Included
+                </div>
+                <ul className="mt-4 space-y-3 text-aether-dark font-semibold">
+                  <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-aether-accent"></span> Signup / Login</li>
+                  <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-aether-secondary"></span> Habit month grid + editor</li>
+                  <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-aether-leaf"></span> Week + Today pages</li>
+                  <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-aether-sand"></span> Today: tasks board + notes + focus</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function AuthCard({ title, subtitle, children }){
+      return (
+        <div className="min-h-screen flex items-center justify-center px-4 py-10">
+          <div className="w-full max-w-md aerogel-card p-7 md:p-9 animate-soft-rise">
+            <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted">{APP_NAME}</div>
+            <h2 className="font-display font-bold text-3xl text-aether-dark mt-2">{title}</h2>
+            <p className="text-aether-muted font-medium mt-2">{subtitle}</p>
+            <div className="mt-7">{children}</div>
+            <div className="mt-6">
+              <a href="#/" className="btn-control w-full"><Icon name="arrow-left" /> Back</a>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function Signup({ onDone }){
+      const [name, setName] = useState("");
+      const [email, setEmail] = useState("");
+      const [pw, setPw] = useState("");
+      const [pw2, setPw2] = useState("");
+
+      const submit = (e)=>{
+        e.preventDefault();
+        if(pw !== pw2) return toast("Passwords do not match.", "err");
+        try{
+          Auth.signup({ name: name.trim() || "User", email: email.trim(), password: pw });
+          toast("Account created.");
+          onDone();
+        }catch(err){
+          toast(err.message || "Signup failed.", "err");
+        }
+      };
+
+      return (
+        <AuthCard title="Create account" subtitle="Start clean. Stay consistent.">
+          <form onSubmit={submit} className="space-y-4">
+            <div>
+              <label className="label-small">Name</label>
+              <input className="input-glass" value={name} onChange={e=>setName(e.target.value)} placeholder="Your name" />
+            </div>
+            <div>
+              <label className="label-small">Email</label>
+              <input className="input-glass" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@email.com" type="email" required />
+            </div>
+            <div>
+              <label className="label-small">Password</label>
+              <input className="input-glass" value={pw} onChange={e=>setPw(e.target.value)} placeholder="min 6 chars" type="password" minLength="6" required />
+            </div>
+            <div>
+              <label className="label-small">Confirm</label>
+              <input className="input-glass" value={pw2} onChange={e=>setPw2(e.target.value)} placeholder="repeat password" type="password" minLength="6" required />
+            </div>
+            <button className="btn-control btn-primary bg-aether-dark text-white hover:bg-aether-accent px-6 py-3 w-full">
+              <Icon name="sparkles" /> Create
+            </button>
+          </form>
+          <div className="mt-4 text-sm font-semibold">
+            <span className="text-aether-muted">Already have an account? </span>
+            <a href="#/login" className="text-aether-secondary hover:text-aether-accent">Log in</a>
+          </div>
+        </AuthCard>
+      );
+    }
+
+    function Login({ onDone }){
+      const [email, setEmail] = useState("");
+      const [pw, setPw] = useState("");
+
+      const submit = (e)=>{
+        e.preventDefault();
+        try{
+          Auth.login({ email: email.trim(), password: pw });
+          toast("Logged in.");
+          onDone();
+        }catch(err){
+          toast(err.message || "Login failed.", "err");
+        }
+      };
+
+      return (
+        <AuthCard title="Log in" subtitle="Back to momentum.">
+          <form onSubmit={submit} className="space-y-4">
+            <div>
+              <label className="label-small">Email</label>
+              <input className="input-glass" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@email.com" type="email" required />
+            </div>
+            <div>
+              <label className="label-small">Password</label>
+              <input className="input-glass" value={pw} onChange={e=>setPw(e.target.value)} placeholder="your password" type="password" required />
+            </div>
+            <button className="btn-control btn-primary bg-aether-dark text-white hover:bg-aether-accent px-6 py-3 w-full">
+              <Icon name="log-in" /> Log in
+            </button>
+          </form>
+          <div className="mt-4 text-sm font-semibold">
+            <span className="text-aether-muted">No account? </span>
+            <a href="#/signup" className="text-aether-secondary hover:text-aether-accent">Sign up</a>
+          </div>
+        </AuthCard>
+      );
+    }
+
+    // ---- Sidebar (order you requested) ----
+    function Sidebar({ route, go, userName, onLogout }) {
+      const items = [
+        { id: "dashboard", label: "Dashboard", icon: "layout-grid" },
+        { id: "today", label: "Today", icon: "zap" },
+        { id: "week", label: "Week", icon: "calendar" },
+        { id: "habits", label: "Habits", icon: "grid-3x3" },
+        { id: "settings", label: "Settings", icon: "sliders-horizontal" },
+      ];
+
+      return (
+        <aside
+          className="
+            aerogel-card sticky top-4
+            p-4 md:p-5
+            rounded-[28px]
+            bg-white/65
+            border border-white/70
+            shadow-[0_18px_50px_-30px_rgba(0,0,0,0.25)]
+            w-full max-w-[520px] mx-auto
+            lg:w-[210px] lg:max-w-none lg:mx-0
+          "
+        >
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <div className="font-display font-extrabold text-lg text-aether-dark leading-none truncate">
+                {APP_NAME}
+              </div>
+              <div className="text-[10px] font-black text-aether-muted mt-1 tracking-[0.14em] uppercase">
+                Aether UI
+              </div>
+            </div>
+
+            <div className="w-9 h-9 rounded-2xl bg-white border border-white/70 shadow-sm flex items-center justify-center">
+              <span className="w-2 h-2 rounded-full bg-aether-leaf animate-pulse"></span>
+            </div>
+          </div>
+
+          <div className="mt-4 space-y-2">
+            {items.map((it) => {
+              const active = route === it.id;
+              return (
+                <button
+                  key={it.id}
+                  onClick={() => go(it.id)}
+                  className={`
+                    w-full text-left rounded-2xl
+                    px-3 py-2.5
+                    flex items-center gap-3
+                    transition-[transform,background,color,box-shadow,border] duration-200 ease-out
+                    active:scale-[0.98]
+                    border
+                    ${active
+                      ? "bg-aether-dark text-white border-white/10 shadow-md"
+                      : "bg-white/45 text-aether-dark border-white/60 hover:bg-white hover:shadow-sm"
+                    }
+                  `}
+                >
+                  <span className={`
+                    w-10 h-10 rounded-2xl flex items-center justify-center
+                    border shadow-sm transition-all duration-200
+                    ${active ? "bg-white/10 border-white/10" : "bg-white border-white/70"}
+                  `}>
+                    <Icon name={it.icon} size={18} className={active ? "text-white" : "text-aether-dark"} />
+                  </span>
+
+                  <div className="min-w-0 flex-1">
+                    <div className={`text-[13px] font-semibold truncate ${active ? "text-white" : "text-aether-dark"}`}>
+                      {it.label}
+                    </div>
+                    <div className={`text-[11px] font-black tracking-[0.10em] uppercase ${active ? "text-white/60" : "text-aether-muted"}`}>
+                      {active ? "Active" : "Open"}
+                    </div>
+                  </div>
+
+                  <span className={`w-2 h-2 rounded-full transition-all duration-200 ${active ? "bg-aether-accent" : "bg-transparent"}`} />
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="mt-5 pt-4 border-t border-white/60">
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <div className="text-[10px] font-black uppercase tracking-[0.14em] text-aether-muted">
+                  Signed in
+                </div>
+                <div className="font-display font-bold text-base text-aether-dark truncate mt-1">
+                  {userName}
+                </div>
+              </div>
+              <button
+                onClick={onLogout}
+                className="btn-control"
+                style={{ padding: "10px 10px", borderRadius: "14px" }}
+                title="Logout"
+              >
+                <Icon name="log-out" size={16} />
+              </button>
+            </div>
+          </div>
+        </aside>
+      );
+    }
+
+    // ---- Dashboard ----
+    function Dashboard({ store, setStore, goApp }){
+      const today = toISODate(new Date());
+
+      const sum = useMemo(()=> monthSummary(store, new Date()), [store]);
+      const { best: bestHabits, weak: weakSpots } = useMemo(
+        ()=> splitBestWeak(sum.perHabit || [], 3, 3),
+        [sum.perHabit]
+      );
+
+      const wk0 = startOfWeek(new Date());
+      const weekDates = Array.from({length:7}, (_,i)=> toISODate(addDays(wk0,i)));
+      const weekAvg = weekDates.reduce((a,d)=> a + dayOverallPct(store,d), 0) / weekDates.length;
+
+      const active = activeHabits(store);
+      const tasksToday = tasksForDate(store, today);
+
+      const toggleHabit = (hid)=>{
+        setStore(prev=> setHabitDone(prev, today, hid, !getHabitDone(prev, today, hid)));
+        toast("Habit updated.");
+      };
+
+      const toggleTask = (tid)=>{
+        setStore(prev=>{
+          const n = deepClone(prev);
+          const t = n.tasks.find(x=>x.id===tid);
+          if(t) t.status = (t.status==="DONE") ? "OPEN" : "DONE";
+          return n;
+        });
+        toast("Task updated.");
+      };
+
+      const addTask = ()=>{
+        const title = prompt("Task title:");
+        if(!title || !title.trim()) return;
+        setStore(prev=>{
+          const n = deepClone(prev);
+          n.tasks.push({ id: crypto.randomUUID(), title: title.trim(), dueDate: today, status:"OPEN", priority:"MED" });
+          return n;
+        });
+        toast("Task added.");
+      };
+
+      const daily = sum.daily || [];
+
+      const HabitRow = ({ h, tone="accent" }) => (
+        <div className="aerogel-card p-4 bg-white/55">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <div className="font-extrabold text-sm truncate">{h.title}</div>
+              <div className="text-[11px] font-black uppercase tracking-[0.14em] text-aether-muted">
+                {h.actual}/{h.goal} days
+              </div>
+            </div>
+            <div className="font-display font-bold text-2xl text-aether-dark">{h.pct.toFixed(0)}%</div>
+          </div>
+          <div className="mt-3 h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+            <div
+              className={`h-2 rounded-full transition-all ${tone==="secondary" ? "bg-aether-secondary" : "bg-aether-accent"}`}
+              style={{ width: `${clamp(h.pct,0,100)}%` }}
+            />
+          </div>
+        </div>
+      );
+
+      return (
+        <div className="space-y-6 animate-soft-rise">
+          <div className="aerogel-card p-6 md:p-10 relative overflow-hidden">
+            <div className="absolute -right-24 -top-24 w-72 h-72 bg-aether-sand/40 rounded-full blur-3xl"></div>
+            <div className="relative z-10">
+              <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
+                <div>
+                  <Pill><Icon name="layout-grid" size={14} /> Dashboard</Pill>
+                  <h1 className="font-display font-bold text-4xl md:text-5xl text-aether-dark mt-4 tracking-tight">
+                    Build momentum. Daily.
+                  </h1>
+                  <p className="text-aether-muted font-medium mt-3">
+                    Today: <span className="font-bold text-aether-dark">{today}</span>
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <Donut pct={dayOverallPct(store,today)} />
+                  <button className="btn-control" onClick={()=>goApp("today", today)}><Icon name="arrow-right" /> Open Today</button>
+                </div>
+              </div>
+
+              <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <ProgressBar label="Today" pct={dayOverallPct(store,today)} />
+                <ProgressBar label="Week avg" pct={weekAvg} />
+                <ProgressBar label="Month (habits)" pct={sum.overall} />
+              </div>
+            </div>
+          </div>
+
+          <div className="aerogel-card p-6 md:p-8">
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div>
+                <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted">Insights</div>
+                <div className="font-display font-bold text-2xl text-aether-dark mt-2">
+                  {monthLabel(new Date())}
+                </div>
+              </div>
+              <div className="aerogel-card px-4 py-3 bg-white/55">
+                <Donut pct={sum.overall} />
+              </div>
+            </div>
+
+            <div className="mt-6 grid grid-cols-1 xl:grid-cols-3 gap-4">
+              <div className="aerogel-card p-5 bg-white/55 overflow-hidden">
+                <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted">Daily trend</div>
+                <div className="font-display font-bold text-xl text-aether-dark mt-2">Habits-only</div>
+
+                <div className="mt-4 aerogel-card p-4 bg-white/55 overflow-auto custom-scrollbar">
+                  <div className="min-w-[620px]">
+                    <div className="flex items-end gap-2 h-[140px]">
+                      {daily.map((x)=>(
+                        <div key={x.date} className="flex-1 flex flex-col items-center gap-2">
+                          <div className="w-full rounded-xl bg-gray-100 overflow-hidden border border-white/60 shadow-sm">
+                            <div
+                              className="w-full bg-aether-accent rounded-xl"
+                              style={{ height: `${clamp(x.pct,0,100) * 1.2}px` }}
+                              title={`${x.date}: ${x.pct.toFixed(0)}%`}
+                            ></div>
+                          </div>
+                          <div className="text-[10px] font-black uppercase tracking-[0.12em] text-aether-muted">
+                            {String(parseISO(x.date).getDate()).padStart(2,"0")}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="aerogel-card p-5 bg-white/55">
+                <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted">Best habits</div>
+                <div className="font-display font-bold text-xl text-aether-dark mt-2">Keep these</div>
+                <div className="mt-4 space-y-3">
+                  {bestHabits.length === 0 && (
+                    <div className="text-aether-muted font-semibold">No active habits yet.</div>
+                  )}
+                  {bestHabits.map(h => <HabitRow key={h.habitId} h={h} tone="accent" />)}
+                </div>
+              </div>
+
+              <div className="aerogel-card p-5 bg-white/55">
+                <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted">Weak spots</div>
+                <div className="font-display font-bold text-xl text-aether-dark mt-2">Fix fastest</div>
+                <div className="mt-4 space-y-3">
+                  {weakSpots.length === 0 ? (
+                    <div className="text-aether-muted font-semibold">
+                      Not enough distinct habits to compute weak spots.
+                    </div>
+                  ) : (
+                    weakSpots.map(h => <HabitRow key={h.habitId} h={h} tone="secondary" />)
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            <div className="xl:col-span-2 space-y-6">
+              <div className="aerogel-card p-6 md:p-8">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted">Habits today</div>
+                    <div className="font-display font-bold text-2xl text-aether-dark mt-2">Quick toggles</div>
+                  </div>
+                  <button className="btn-control" onClick={()=>goApp("habits")}><Icon name="grid-3x3" /> Manage</button>
+                </div>
+
+                <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {active.map(h=>{
+                    const done = getHabitDone(store, today, h.id);
+                    return (
+                      <button
+                        key={h.id}
+                        onClick={()=>toggleHabit(h.id)}
+                        className={`aerogel-card p-4 text-left flex items-center justify-between gap-4 active:scale-[0.99] transition-transform
+                          ${done ? "bg-aether-dark text-white border-white/10" : "bg-white/50"}
+                        `}
+                      >
+                        <div className="min-w-0">
+                          <div className="font-extrabold text-sm truncate">{h.title}</div>
+                          <div className={`text-[11px] font-black uppercase tracking-[0.14em] ${done ? "text-white/70" : "text-aether-muted"}`}>{h.category}</div>
+                        </div>
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center border shadow-sm ${
+                          done ? "bg-white/10 border-white/10" : "bg-white border-white/60"
+                        }`}>
+                          <Icon name={done ? "check" : "circle"} size={18} className={done ? "text-white" : "text-aether-dark"} />
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="aerogel-card p-6 md:p-8">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted">Tasks</div>
+                    <div className="font-display font-bold text-2xl text-aether-dark mt-2">Today list</div>
+                  </div>
+                  <button className="btn-control" onClick={()=>goApp("today", today)}><Icon name="arrow-right" /> Open Today board</button>
+                </div>
+
+                <div className="mt-5 space-y-2">
+                  {tasksToday.length === 0 && <div className="text-aether-muted font-semibold">No tasks for today.</div>}
+                  {tasksToday.map(t=>(
+                    <button
+                      key={t.id}
+                      onClick={()=>toggleTask(t.id)}
+                      className={`w-full aerogel-card p-4 flex items-center justify-between gap-4 text-left active:scale-[0.99] transition-transform
+                        ${t.status==="DONE" ? "opacity-50 bg-white/30" : "bg-white/60"}
+                      `}
+                    >
+                      <div className="min-w-0">
+                        <div className="font-extrabold text-sm truncate">{t.title}</div>
+                        <div className="text-[11px] font-black uppercase tracking-[0.14em] text-aether-muted">Priority {t.priority} • {t.status}</div>
+                      </div>
+                      <div className="w-10 h-10 rounded-xl bg-white border border-white/60 shadow-sm flex items-center justify-center">
+                        <Icon name={t.status==="DONE" ? "check" : "circle"} size={18} />
+                      </div>
+                    </button>
+                  ))}
+                  <button className="btn-control w-full mt-3" onClick={addTask}><Icon name="plus" /> Add task (today)</button>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <FocusClock store={store} setStore={setStore} />
+              <div className="aerogel-card p-6 md:p-8">
+                <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted">Rule</div>
+                <div className="font-display font-bold text-2xl text-aether-dark mt-2">One win first.</div>
+                <p className="text-aether-muted font-medium mt-3">
+                  Finish one meaningful block before adding more.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ---- Habits (unchanged) ----
+    function Habits({ store, setStore }){
+      const [monthRef, setMonthRef] = useState(()=> new Date());
+      const [openModal, setOpenModal] = useState(false);
+      const [editing, setEditing] = useState(null);
+
+      const days = useMemo(()=> monthDays(monthRef).map(toISODate), [monthRef]);
+      const active = activeHabits(store);
+
+      const sum = useMemo(()=> monthSummary(store, monthRef), [store, monthRef]);
+
+      const openAdd = ()=>{
+        setEditing({ id:null, title:"", category:"Morning", active:true });
+        setOpenModal(true);
+      };
+      const openEdit = (h)=>{
+        setEditing({ id:h.id, title:h.title, category:h.category, active:!!h.active });
+        setOpenModal(true);
+      };
+
+      const saveHabit = ()=>{
+        if(!editing?.title?.trim()) return toast("Title is required.", "err");
+        setStore(prev=>{
+          const n = deepClone(prev);
+          if(editing.id){
+            const h = n.habits.find(x=>x.id===editing.id);
+            if(h){
+              h.title = editing.title.trim();
+              h.category = editing.category.trim() || "General";
+              h.active = !!editing.active;
+            }
+          }else{
+            n.habits.push({
+              id: crypto.randomUUID(),
+              title: editing.title.trim(),
+              category: editing.category.trim() || "General",
+              active: !!editing.active
+            });
+          }
+          return n;
+        });
+        setOpenModal(false);
+        toast("Habit saved.");
+      };
+
+      const delHabit = (hid)=>{
+        if(!confirm("Delete this habit?")) return;
+        setStore(prev=>{
+          const n = deepClone(prev);
+          n.habits = n.habits.filter(h=>h.id!==hid);
+          return n;
+        });
+        toast("Habit deleted.");
+      };
+
+      const toggleCell = (date, hid)=>{
+        setStore(prev => setHabitDone(prev, date, hid, !getHabitDone(prev, date, hid)));
+      };
+
+      const prevMonth = ()=> setMonthRef(d=> new Date(d.getFullYear(), d.getMonth()-1, 1));
+      const nextMonth = ()=> setMonthRef(d=> new Date(d.getFullYear(), d.getMonth()+1, 1));
+      const resetMonth = ()=> setMonthRef(new Date());
+
+      return (
+        <div className="space-y-6 animate-soft-rise">
+          <div className="aerogel-card p-6 md:p-10 relative overflow-hidden">
+            <div className="absolute -right-24 -top-24 w-72 h-72 bg-aether-secondary/10 rounded-full blur-3xl"></div>
+            <div className="relative z-10 flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
+              <div>
+                <Pill><Icon name="grid-3x3" size={14} /> Habits</Pill>
+                <h1 className="font-display font-bold text-4xl md:text-5xl text-aether-dark mt-4 tracking-tight">
+                  Month grid
+                </h1>
+                <p className="text-aether-muted font-medium mt-3">
+                  Track consistency. Click any cell to toggle.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3 flex-wrap">
+                <div className="aerogel-card px-4 py-3 flex items-center gap-3">
+                  <Donut pct={sum.overall} />
+                </div>
+                <button className="btn-control" onClick={openAdd}><Icon name="plus" /> Add habit</button>
+              </div>
+            </div>
+          </div>
+
+          <div className="aerogel-card p-6 md:p-8">
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="min-w-0">
+                <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted">Month</div>
+                <div className="font-display font-bold text-2xl text-aether-dark mt-2">{monthLabel(monthRef)}</div>
+              </div>
+              <div className="flex gap-2 flex-wrap">
+                <button className="btn-control" onClick={prevMonth}><Icon name="chevron-left" /> Prev</button>
+                <button className="btn-control" onClick={resetMonth}><Icon name="rotate-ccw" /> Today</button>
+                <button className="btn-control" onClick={nextMonth}>Next <Icon name="chevron-right" /></button>
+              </div>
+            </div>
+
+            <div className="mt-5 grid grid-cols-1 xl:grid-cols-[360px_minmax(0,1fr)] gap-6 items-start">
+              <div className="space-y-3">
+                <div className="aerogel-card p-5 bg-white/55">
+                  <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted">Habits</div>
+                  <div className="font-display font-bold text-xl text-aether-dark mt-2">{store.habits.length} total</div>
+                  <div className="text-aether-muted font-medium mt-2">Active habits count in scores.</div>
+                </div>
+
+                <div className="space-y-2">
+                  {store.habits.map(h=>(
+                    <div key={h.id} className="aerogel-card p-4 bg-white/55 flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="font-extrabold text-sm truncate">{h.title}</div>
+                        <div className="text-[11px] font-black uppercase tracking-[0.14em] text-aether-muted">
+                          {h.category} • {h.active ? "ACTIVE" : "INACTIVE"}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button className="btn-control" onClick={()=>openEdit(h)} title="Edit"><Icon name="pencil" size={16} /></button>
+                        <button className="btn-control danger" onClick={()=>delHabit(h.id)} title="Delete"><Icon name="trash-2" size={16} /></button>
+                      </div>
+                    </div>
+                  ))}
+                  {store.habits.length===0 && (
+                    <div className="text-aether-muted font-semibold">No habits yet.</div>
+                  )}
+                </div>
+              </div>
+
+              <div className="aerogel-card p-5 bg-white/55 overflow-hidden">
+                <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted">Grid</div>
+                <div className="font-display font-bold text-xl text-aether-dark mt-2">Click to toggle</div>
+
+                <div className="mt-4 overflow-auto custom-scrollbar">
+                  <div className="min-w-[820px]">
+                    <div className="grid" style={{ gridTemplateColumns: `280px repeat(${days.length}, 1fr)` }}>
+                      <div className="px-3 py-2 text-[11px] font-black uppercase tracking-[0.14em] text-aether-muted">Habit</div>
+                      {days.map(d=>(
+                        <div key={d} className="px-2 py-2 text-[10px] font-black uppercase tracking-[0.12em] text-aether-muted text-center">
+                          {String(parseISO(d).getDate()).padStart(2,"0")}
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="space-y-2">
+                      {store.habits.map(h=>(
+                        <div key={h.id} className="grid items-center" style={{ gridTemplateColumns: `280px repeat(${days.length}, 1fr)` }}>
+                          <div className="px-3 py-2">
+                            <div className="font-extrabold text-sm truncate">{h.title}</div>
+                            <div className="text-[11px] font-black uppercase tracking-[0.14em] text-aether-muted truncate">{h.category}</div>
+                          </div>
+                          {days.map(d=>{
+                            const done = getHabitDone(store, d, h.id);
+                            return (
+                              <button
+                                key={`${h.id}-${d}`}
+                                onClick={()=>toggleCell(d, h.id)}
+                                className={`
+                                  mx-1 my-1 h-8 rounded-xl border shadow-sm transition-transform active:scale-[0.97]
+                                  ${done ? "bg-aether-dark border-white/10" : "bg-white/80 border-white/60 hover:bg-white"}
+                                `}
+                                title={`${h.title} • ${d}`}
+                              >
+                                <span className={`inline-flex w-full h-full items-center justify-center ${done ? "text-white" : "text-aether-muted"}`}>
+                                  <Icon name={done ? "check" : "dot"} size={16} />
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      ))}
+                      {store.habits.length===0 && (
+                        <div className="text-aether-muted font-semibold px-3 py-6">Add a habit to see the grid.</div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {active.length===0 && (
+                  <div className="mt-4 text-aether-muted font-semibold">
+                    You have 0 active habits. Turn some on to track progress.
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <Modal
+            open={openModal}
+            title={editing?.id ? "Edit habit" : "Add habit"}
+            subtitle="Habits"
+            onClose={()=>setOpenModal(false)}
+          >
+            <div className="space-y-4">
+              <div>
+                <label className="label-small">Title</label>
+                <input className="input-glass" value={editing?.title || ""} onChange={e=>setEditing(s=>({...s, title:e.target.value}))} placeholder="e.g., Deep Work" />
+              </div>
+              <div>
+                <label className="label-small">Category</label>
+                <input className="input-glass" value={editing?.category || ""} onChange={e=>setEditing(s=>({...s, category:e.target.value}))} placeholder="Morning / Work / Body..." />
+              </div>
+              <div className="aerogel-card p-4 bg-white/55 flex items-center justify-between">
+                <div>
+                  <div className="font-extrabold text-sm">Active</div>
+                  <div className="text-aether-muted font-medium text-sm">Active habits count in scores.</div>
+                </div>
+                <button
+                  className="btn-control"
+                  onClick={()=>setEditing(s=>({...s, active: !s.active}))}
+                >
+                  <Icon name={editing?.active ? "toggle-right" : "toggle-left"} /> {editing?.active ? "On" : "Off"}
+                </button>
+              </div>
+
+              <div className="flex gap-2">
+                <button className="btn-control flex-1" onClick={()=>setOpenModal(false)}><Icon name="x" /> Cancel</button>
+                <button className="btn-control btn-primary bg-aether-dark text-white hover:bg-aether-accent flex-1" onClick={saveHabit}>
+                  <Icon name="save" /> Save
+                </button>
+              </div>
+            </div>
+          </Modal>
+        </div>
+      );
+    }
+
+    // ---- Week (updated to open Today) ----
+    function Week({ store, goApp }){
+      const [ref, setRef] = useState(()=> new Date());
+      const w0 = useMemo(()=> startOfWeek(ref), [ref]);
+      const days = useMemo(()=> Array.from({length:7}, (_,i)=> toISODate(addDays(w0,i))), [w0]);
+
+      const prevWeek = ()=> setRef(d=> addDays(d, -7));
+      const nextWeek = ()=> setRef(d=> addDays(d, 7));
+      const today = ()=> setRef(new Date());
+
+      const avg = days.reduce((a,d)=>a+dayOverallPct(store,d),0)/days.length;
+
+      return (
+        <div className="space-y-6 animate-soft-rise">
+          <div className="aerogel-card p-6 md:p-10 relative overflow-hidden">
+            <div className="absolute -right-24 -top-24 w-72 h-72 bg-aether-sand/40 rounded-full blur-3xl"></div>
+            <div className="relative z-10 flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
+              <div>
+                <Pill><Icon name="calendar" size={14} /> Week</Pill>
+                <h1 className="font-display font-bold text-4xl md:text-5xl text-aether-dark mt-4 tracking-tight">
+                  Weekly overview
+                </h1>
+                <p className="text-aether-muted font-medium mt-3">
+                  One glance. Seven days. Keep it moving.
+                </p>
+              </div>
+              <div className="flex items-center gap-3 flex-wrap">
+                <div className="aerogel-card px-4 py-3 flex items-center gap-3">
+                  <Donut pct={avg} />
+                </div>
+                <button className="btn-control" onClick={()=>goApp("today", toISODate(new Date()))}><Icon name="arrow-right" /> Open Today</button>
+              </div>
+            </div>
+          </div>
+
+          <div className="aerogel-card p-6 md:p-8">
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="min-w-0">
+                <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted">Week starting</div>
+                <div className="font-display font-bold text-2xl text-aether-dark mt-2">{toISODate(w0)}</div>
+              </div>
+              <div className="flex gap-2 flex-wrap">
+                <button className="btn-control" onClick={prevWeek}><Icon name="chevron-left" /> Prev</button>
+                <button className="btn-control" onClick={today}><Icon name="rotate-ccw" /> Today</button>
+                <button className="btn-control" onClick={nextWeek}>Next <Icon name="chevron-right" /></button>
+              </div>
+            </div>
+
+            <div className="mt-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {days.map(d=>{
+                const pct = dayOverallPct(store, d);
+                const hp = dayHabitPct(store,d);
+                const tp = dayTaskPct(store,d);
+                return (
+                  <button
+                    key={d}
+                    onClick={()=>goApp("today", d)}
+                    className="aerogel-card p-5 bg-white/55 text-left active:scale-[0.99] transition-transform"
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted">{fmtShort(d)}</div>
+                        <div className="font-display font-bold text-2xl text-aether-dark mt-2">{pct.toFixed(0)}%</div>
+                      </div>
+                      <div className="w-10 h-10 rounded-2xl bg-white border border-white/60 shadow-sm flex items-center justify-center">
+                        <Icon name="arrow-right" size={18} />
+                      </div>
+                    </div>
+
+                    <div className="mt-4 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="text-[11px] font-black uppercase tracking-[0.14em] text-aether-muted">Habits</div>
+                        <div className="text-sm font-extrabold text-aether-dark">{hp.toFixed(0)}%</div>
+                      </div>
+                      <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-2 bg-aether-accent rounded-full transition-all" style={{ width: `${clamp(hp,0,100)}%` }}></div>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-1">
+                        <div className="text-[11px] font-black uppercase tracking-[0.14em] text-aether-muted">Tasks</div>
+                        <div className="text-sm font-extrabold text-aether-dark">{tp.toFixed(0)}%</div>
+                      </div>
+                      <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-2 bg-aether-secondary rounded-full transition-all" style={{ width: `${clamp(tp,0,100)}%` }}></div>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ---- TODAY (engineered: tasks merged + edit modal + focus + habits + notes) ----
+    function Today({ store, setStore, dateISO }){
+      const date = dateISO || toISODate(new Date());
+      const active = activeHabits(store);
+
+      const [note, setNote] = useState(()=> store.notesByDate?.[date] || "");
+      useEffect(()=>{ setNote(store.notesByDate?.[date] || ""); }, [date]);
+
+      // Tasks board state
+      const [scope, setScope] = useState("TODAY"); // TODAY | UPCOMING | ALL
+      const [q, setQ] = useState("");
+      const [openTaskModal, setOpenTaskModal] = useState(false);
+      const [taskEdit, setTaskEdit] = useState(null);
+
+      const openAddTask = ()=>{
+        setTaskEdit({ id:null, title:"", dueDate: date, status:"OPEN", priority:"MED" });
+        setOpenTaskModal(true);
+      };
+      const openEditTask = (t)=>{
+        setTaskEdit({ id:t.id, title:t.title, dueDate:t.dueDate, status:t.status, priority:t.priority });
+        setOpenTaskModal(true);
+      };
+
+      const saveTask = ()=>{
+        if(!taskEdit?.title?.trim()) return toast("Task title required.", "err");
+        if(!taskEdit?.dueDate) return toast("Due date required.", "err");
+
+        setStore(prev=>{
+          const n = deepClone(prev);
+          if(taskEdit.id){
+            const t = n.tasks.find(x=>x.id===taskEdit.id);
+            if(t){
+              t.title = taskEdit.title.trim();
+              t.dueDate = taskEdit.dueDate;
+              t.status = taskEdit.status;
+              t.priority = taskEdit.priority;
+            }
+          }else{
+            n.tasks.push({
+              id: crypto.randomUUID(),
+              title: taskEdit.title.trim(),
+              dueDate: taskEdit.dueDate,
+              status: taskEdit.status,
+              priority: taskEdit.priority
+            });
+          }
+          return n;
         });
 
-        // --- 1. REIMAGINED DOCK (SMART BAR) ---
-        // Adapted: Fixed position bottom, safe area padding, hides labels on mobile
-        const CommandDock = ({ view, setView }) => {
-            const items = [
-                { id: 'home', icon: 'layout-grid', label: 'Dash' },
-                { id: 'week', icon: 'calendar', label: 'Plan' },
-                { id: 'day', icon: 'zap', label: 'Focus' },
-                { id: 'projects', icon: 'layers', label: 'Projs' },
-            ];
+        setOpenTaskModal(false);
+        toast("Task saved.");
+      };
 
-            return (
-                <div className="fixed bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 z-50 w-full max-w-[95%] md:max-w-2xl px-2 safe-pb">
-                    <div className="bg-white/90 backdrop-blur-xl border border-white/60 p-1.5 md:p-2 rounded-2xl shadow-[0_20px_50px_-10px_rgba(0,0,0,0.2)] flex gap-1 md:gap-2 items-center justify-between">
-                        {items.map(item => {
-                            const isActive = view === item.id;
-                            return (
-                                <button 
-                                    key={item.id} 
-                                    onClick={() => setView(item.id)} 
-                                    className={`
-                                        relative flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 flex-1 py-3 md:py-3 px-2 md:px-4 rounded-xl transition-all duration-300 ease-out group
-                                        ${isActive 
-                                            ? 'bg-aether-dark text-white shadow-md' 
-                                            : 'text-aether-muted hover:bg-white hover:text-aether-dark'
-                                        }
-                                    `}
-                                >
-                                    <Icon name={item.icon} size={20} strokeWidth={isActive ? 2.5 : 2} />
-                                    {/* Text hidden on mobile, visible on desktop */}
-                                    <span className={`text-[10px] md:text-xs font-bold uppercase tracking-wide transition-all duration-300 ${isActive ? 'opacity-100' : 'hidden md:block opacity-70 group-hover:opacity-100'}`}>
-                                        {item.label}
-                                    </span>
-                                    {isActive && <div className="absolute -top-1 right-1 w-1.5 h-1.5 bg-aether-accent rounded-full animate-pulse"></div>}
-                                </button>
-                            )
-                        })}
-                    </div>
+      const deleteTask = (tid)=>{
+        if(!confirm("Delete this task?")) return;
+        setStore(prev=>{
+          const n = deepClone(prev);
+          n.tasks = n.tasks.filter(t=>t.id!==tid);
+          return n;
+        });
+        toast("Task deleted.");
+      };
+
+      const toggleTask = (tid)=>{
+        setStore(prev=>{
+          const n = deepClone(prev);
+          const t = n.tasks.find(x=>x.id===tid);
+          if(t) t.status = (t.status==="DONE") ? "OPEN" : "DONE";
+          return n;
+        });
+      };
+
+      const toggleHabit = (hid)=>{
+        setStore(prev=> setHabitDone(prev, date, hid, !getHabitDone(prev, date, hid)));
+      };
+
+      const saveNote = ()=>{
+        setStore(prev=>{
+          const n = deepClone(prev);
+          n.notesByDate = n.notesByDate || {};
+          n.notesByDate[date] = note;
+          return n;
+        });
+        toast("Note saved.");
+      };
+
+      const filteredTasks = useMemo(()=>{
+        const all = [...store.tasks];
+        const after = all.filter(t => (t.dueDate || "") > date);
+        const today = all.filter(t => t.dueDate === date);
+
+        let base = all;
+        if(scope==="TODAY") base = today;
+        if(scope==="UPCOMING") base = after;
+
+        if(q.trim()){
+          const s = q.trim().toLowerCase();
+          base = base.filter(t =>
+            (t.title||"").toLowerCase().includes(s) ||
+            (t.priority||"").toLowerCase().includes(s) ||
+            (t.dueDate||"").includes(s) ||
+            (t.status||"").toLowerCase().includes(s)
+          );
+        }
+
+        base.sort((a,b)=> (a.dueDate||"").localeCompare(b.dueDate||"") || (a.status||"").localeCompare(b.status||"") || (a.title||"").localeCompare(b.title||""));
+        return base;
+      }, [store.tasks, scope, q, date]);
+
+      const todayTasks = tasksForDate(store, date);
+      const openCount = todayTasks.filter(t=>t.status==="OPEN").length;
+      const doneCount = todayTasks.filter(t=>t.status==="DONE").length;
+
+      const hp = dayHabitPct(store, date);
+      const tp = dayTaskPct(store, date);
+      const op = dayOverallPct(store, date);
+
+      return (
+        <div className="space-y-6 animate-soft-rise">
+          <div className="aerogel-card p-6 md:p-10 relative overflow-hidden">
+            <div className="absolute -right-24 -top-24 w-72 h-72 bg-aether-secondary/10 rounded-full blur-3xl"></div>
+            <div className="relative z-10 flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
+              <div>
+                <Pill><Icon name="zap" size={14} /> Today</Pill>
+                <h1 className="font-display font-bold text-4xl md:text-5xl text-aether-dark mt-4 tracking-tight">
+                  {date}
+                </h1>
+                <p className="text-aether-muted font-medium mt-3">
+                  One page. Habits + tasks + focus + notes. Engineered for execution.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3 flex-wrap">
+                <div className="aerogel-card px-4 py-3 bg-white/55">
+                  <Donut pct={op} />
                 </div>
-            );
-        };
-
-        // --- 2. HOME VIEW ---
-        // Adapted: Flex-col for mobile stacking, smaller fonts for mobile
-        const HomeView = ({ xp, stats, now }) => {
-            const level = Math.floor(xp / 100) + 1;
-            const progress = xp % 100; 
-            const circumference = 2 * Math.PI * 50;
-            const offset = circumference - (progress / 100) * circumference;
-
-            return (
-                <div className="max-w-5xl mx-auto pt-8 md:pt-16 pb-40 px-4 md:px-8 animate-soft-rise">
-                    <div className="flex flex-col md:flex-row items-center md:items-end justify-between gap-8 md:gap-12 mb-12">
-                        <div className="flex flex-col md:flex-row items-center gap-6 md:gap-8 text-center md:text-left">
-                            <div className="relative w-24 h-24 md:w-32 md:h-32 shrink-0">
-                                <svg className="w-full h-full transform -rotate-90 drop-shadow-lg">
-                                    <circle className="stroke-white/60 fill-none" cx="50%" cy="50%" r="46%" strokeWidth="6" />
-                                    <circle className="stroke-aether-accent fill-none transition-all duration-1000" cx="50%" cy="50%" r="46%" strokeWidth="6" strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" />
-                                </svg>
-                                <div className="absolute inset-3 rounded-full overflow-hidden border-4 border-white shadow-sm bg-gray-200">
-                                    <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=400&q=80" className="w-full h-full object-cover filter sepia-[.25] contrast-110 brightness-110" />
-                                </div>
-                                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-white text-aether-dark shadow-md text-[11px] font-bold px-3 py-1 rounded-full border border-gray-100">Lvl {level}</div>
-                            </div>
-                            <div>
-                                <h1 className="font-display font-bold text-4xl md:text-6xl text-aether-dark mb-2 tracking-tight">Samir OS</h1>
-                                <div className="flex items-center justify-center md:justify-start gap-3 text-aether-muted font-medium">
-                                    <span className="w-2 h-2 rounded-full bg-aether-leaf animate-pulse"></span>
-                                    <span>System Operational</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="text-center md:text-right">
-                            <div className="font-display font-bold text-6xl md:text-8xl text-aether-dark tracking-tighter leading-none">
-                                {now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                            </div>
-                            <div className="text-aether-secondary font-bold text-xs md:text-sm mt-2 uppercase tracking-widest">
-                                {now.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
-                        <div className="md:col-span-7 aerogel-card p-6 md:p-10 relative overflow-hidden group">
-                            <div className="absolute -right-20 -top-20 w-64 h-64 bg-aether-sand/30 rounded-full blur-3xl pointer-events-none"></div>
-                            <div className="relative z-10">
-                                <div className="flex items-center gap-3 mb-6 md:mb-8">
-                                    <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm text-aether-accent"><Icon name="radio" size={16} /></div>
-                                    <span className="text-aether-muted text-xs font-bold uppercase tracking-widest">Directives</span>
-                                </div>
-                                <h2 className="font-display font-bold text-3xl md:text-4xl text-aether-dark mb-4 leading-tight">{stats.currentTask ? stats.currentTask.title : "Leisure Time"}</h2>
-                                <p className="text-aether-muted text-base md:text-lg mb-8 md:mb-10 font-light max-w-md">
-                                    {stats.currentTask ? `Scheduled until ${stats.currentTask.startHour + stats.currentTask.duration}:00. Stay focused.` : "No active tasks. Enjoy the day."}
-                                </p>
-                                <button className={STYLES.BTN_PRIMARY}>
-                                    Open Details <Icon name="arrow-right" size={18}/>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="md:col-span-5 flex flex-col gap-6">
-                            <div className="aerogel-card p-6 md:p-8 flex items-center justify-between">
-                                <div>
-                                    <div className="text-4xl md:text-5xl font-display font-bold text-aether-dark mb-1">{stats.tasksLeft}</div>
-                                    <div className="text-aether-muted text-xs font-bold uppercase tracking-wider">Tasks Pending</div>
-                                </div>
-                                <div className="w-16 h-16 rounded-2xl bg-aether-secondary/10 text-aether-secondary flex items-center justify-center"><Icon name="layers" size={32} /></div>
-                            </div>
-                            <div className="aerogel-card p-6 md:p-8 flex-1">
-                                <div className="text-aether-muted text-xs font-bold uppercase tracking-wider mb-6 flex items-center gap-2"><Icon name="list" size={14}/> Up Next</div>
-                                <ul className="space-y-4">
-                                    {stats.upcomingTodos.map(t => (
-                                        <li key={t.id} className="flex items-center gap-4 text-aether-dark">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-aether-accent shrink-0"></div>
-                                            <span className="font-medium text-sm md:text-base truncate">{t.text}</span>
-                                        </li>
-                                    ))}
-                                    {stats.upcomingTodos.length === 0 && <li className="text-aether-muted italic">All clear.</li>}
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
+                <div className="aerogel-card px-4 py-3 bg-white/55">
+                  <div className="text-[10px] font-black uppercase tracking-[0.14em] text-aether-muted">Tasks</div>
+                  <div className="font-display font-bold text-2xl">{doneCount}/{todayTasks.length}</div>
                 </div>
-            );
-        };
+                <button className="btn-control" onClick={openAddTask}><Icon name="plus" /> Add task</button>
+              </div>
+            </div>
+          </div>
 
-        // --- 3. WEEKLY PLANNER (Mobile Scroll Fix) ---
-        const WeeklyPlanner = ({ schedule, setSchedule, now }) => {
-            const [viewMode, setViewMode] = useState('week'); 
-            const [focusDate, setFocusDate] = useState(new Date(now));
-            const [dragData, setDragData] = useState(null);
-            const [editTask, setEditTask] = useState(null);
-            const [customTaskName, setCustomTaskName] = useState(""); 
-
-            // --- NAVIGATION LOGIC ---
-            const navigate = (direction) => {
-                const d = new Date(focusDate);
-                if (viewMode === 'week') d.setDate(d.getDate() + (direction * 7));
-                else if (viewMode === 'month') d.setMonth(d.getMonth() + direction);
-                else if (viewMode === 'year') d.setFullYear(d.getFullYear() + direction);
-                else if (viewMode === 'decade') d.setFullYear(d.getFullYear() + (direction * 10));
-                setFocusDate(d);
-            };
-
-            const goToToday = () => { setFocusDate(new Date()); setViewMode('week'); };
-
-            // --- DRAG & DROP (Simplistic implementation for demo) ---
-            const handleDragStart = (e, type, item) => { 
-                setDragData({ type, item }); 
-                // Mobile often has issues with standard HTML5 DnD, relies on Touch API
-                // Keeping this for desktop usage mainly
-                e.dataTransfer.effectAllowed = 'move'; 
-            };
-            
-            const handleDrop = (e, dateStr, hour) => {
-                e.preventDefault(); 
-                if (!dragData) return;
-                let newSchedule = [...schedule];
-                
-                if (dragData.type === 'LIBRARY') {
-                    newSchedule.push({ 
-                        id: Date.now().toString(), 
-                        title: dragData.item.title, 
-                        duration: dragData.item.duration, 
-                        date: dateStr, 
-                        startHour: hour 
-                    });
-                } else {
-                    newSchedule = newSchedule.map(t => t.id === dragData.item.id ? { ...t, date: dateStr, startHour: hour } : t);
-                }
-                setSchedule(newSchedule); 
-                setDragData(null);
-            };
-
-            const saveEdit = () => { setSchedule(schedule.map(t => t.id === editTask.id ? editTask : t)); setEditTask(null); };
-            const deleteTask = () => { setSchedule(schedule.filter(t => t.id !== editTask.id)); setEditTask(null); };
-
-            // --- SUB-VIEWS ---
-            const DecadeView = () => {
-                const currentYear = focusDate.getFullYear();
-                const startYear = Math.floor(currentYear / 10) * 10; 
-                const years = Array.from({ length: 12 }, (_, i) => startYear - 1 + i); 
-                return (
-                    <div className="p-4 md:p-8 animate-soft-rise pb-32">
-                         <div className="grid grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
-                            {years.map(y => {
-                                const isCurrentYear = new Date().getFullYear() === y;
-                                const isSelectedYear = currentYear === y;
-                                const isOutOfDecade = y < startYear || y > startYear + 9;
-                                return (
-                                    <div key={y} onClick={() => { const d = new Date(focusDate); d.setFullYear(y); setFocusDate(d); setViewMode('year'); }} className={`aerogel-card h-24 md:h-32 flex items-center justify-center cursor-pointer transition-all active:scale-95 ${isSelectedYear ? 'bg-aether-dark text-white' : 'hover:bg-white'} ${isCurrentYear ? 'border-2 border-aether-accent' : ''} ${isOutOfDecade ? 'opacity-40' : 'opacity-100'}`}>
-                                        <div className={`font-display font-bold text-xl md:text-3xl ${isSelectedYear ? 'text-white' : 'text-aether-dark'}`}>{y}</div>
-                                    </div>
-                                )
-                            })}
-                        </div>
+          <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_420px] gap-6 items-start">
+            {/* LEFT: Tasks board */}
+            <div className="space-y-6">
+              <div className="aerogel-card p-6 md:p-8">
+                <div className="flex items-center justify-between gap-4 flex-wrap">
+                  <div>
+                    <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted">Tasks board</div>
+                    <div className="font-display font-bold text-2xl text-aether-dark mt-2">Execution queue</div>
+                    <div className="text-aether-muted font-medium mt-2">
+                      Today: <span className="font-bold text-aether-dark">{openCount}</span> open • <span className="font-bold text-aether-dark">{doneCount}</span> done
                     </div>
-                );
-            };
+                  </div>
 
-            const YearView = () => {
-                const year = focusDate.getFullYear();
-                return (
-                    <div className="p-4 md:p-8 animate-soft-rise pb-32">
-                        <div className="grid grid-cols-3 md:grid-cols-4 gap-3 md:gap-6">
-                            {MONTHS.map((m, i) => {
-                                 const isCurrentMonth = new Date().getMonth() === i && new Date().getFullYear() === year;
-                                 return (
-                                    <div key={m} onClick={() => { const d = new Date(focusDate); d.setMonth(i); setFocusDate(d); setViewMode('month'); }} className={`aerogel-card p-3 md:p-6 hover:bg-white cursor-pointer transition-all group aspect-square flex flex-col justify-between ${isCurrentMonth ? 'border-aether-accent/50 bg-aether-accent/5' : ''}`}>
-                                            <div className={`text-xs md:text-lg font-bold truncate ${isCurrentMonth ? 'text-aether-accent' : 'text-aether-dark'}`}>{m.substring(0,3)}</div>
-                                            <div className="text-2xl md:text-4xl font-display font-bold text-gray-200 group-hover:text-gray-300">{i+1}</div>
-                                    </div>
-                                 )
-                            })}
-                        </div>
-                    </div>
-                );
-            };
-
-            const MonthView = () => {
-                const year = focusDate.getFullYear();
-                const month = focusDate.getMonth();
-                const daysInMonth = new Date(year, month + 1, 0).getDate();
-                const firstDay = new Date(year, month, 1);
-                const startDayIdx = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1; 
-                const blanks = Array(startDayIdx).fill(null);
-                const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
-                return (
-                    <div className="p-4 md:p-8 animate-soft-rise h-full flex flex-col pb-32">
-                        <div className="grid grid-cols-7 mb-4">
-                            {DAYS.map(d => <div key={d} className="text-center text-[10px] md:text-xs font-bold uppercase text-aether-muted">{d.substring(0,1)}</div>)}
-                        </div>
-                        <div className="grid grid-cols-7 auto-rows-fr gap-1 md:gap-2 flex-1 min-h-[300px]">
-                            {blanks.map((_, i) => <div key={`b-${i}`}></div>)}
-                            {days.map(d => {
-                                const dateStr = toISODate(new Date(year, month, d));
-                                const isToday = dateStr === toISODate(new Date());
-                                const tasksForDay = schedule.filter(t => t.date === dateStr);
-                                return (
-                                    <div key={d} onClick={() => { const date = new Date(year, month, d); setFocusDate(date); setViewMode('week'); }} className={`rounded-lg md:rounded-xl border p-1 md:p-2 cursor-pointer transition-all active:scale-95 relative overflow-hidden flex flex-col min-h-[60px] ${isToday ? 'bg-white border-aether-accent shadow-md' : 'bg-white/40 border-white/60 hover:bg-white'}`}>
-                                        <div className={`text-xs font-bold mb-1 w-5 h-5 md:w-6 md:h-6 flex items-center justify-center rounded-full ${isToday ? 'bg-aether-accent text-white' : 'text-aether-dark'}`}>{d}</div>
-                                        <div className="flex-1 overflow-hidden space-y-1 hidden md:block">
-                                            {tasksForDay.slice(0,3).map(t => <div key={t.id} className="h-1.5 w-full rounded-full bg-aether-secondary/50"></div>)}
-                                        </div>
-                                        {/* Mobile Dots for tasks */}
-                                        <div className="flex md:hidden gap-0.5 flex-wrap mt-1">
-                                            {tasksForDay.slice(0,4).map(t => <div key={t.id} className="w-1 h-1 rounded-full bg-aether-secondary"></div>)}
-                                        </div>
-                                    </div>
-                                )
-                            })}
-                        </div>
-                    </div>
-                );
-            };
-
-            // Adapted: Horizontal scroll wrapper for mobile
-            const WeekView = () => {
-                const startOfWk = getStartOfWeek(focusDate);
-                const weekDates = Array.from({length: 7}, (_, i) => addDays(startOfWk, i));
-                return (
-                    <div className="flex-1 overflow-hidden relative z-10 animate-soft-rise">
-                        {/* This div provides horizontal scroll on mobile while keeping desktop layout fixed if space allows */}
-                        <div className="h-full overflow-auto custom-scrollbar">
-                            <div className="min-w-[800px] grid grid-cols-[50px_repeat(7,_1fr)] bg-white/40 pb-32">
-                                <div className="border-r border-white/60 bg-white/50 sticky left-0 z-20 backdrop-blur-sm">
-                                    <div className="h-12 md:h-14 border-b border-white/60 sticky top-0 z-30 bg-white/80"></div>
-                                    {HOURS.map(h => <div key={h} className="h-16 md:h-20 border-b border-white/60 text-[10px] font-bold text-aether-muted text-center pt-2">{h}:00</div>)}
-                                </div>
-                                {weekDates.map((date, dayIdx) => {
-                                    const isToday = toISODate(date) === toISODate(new Date());
-                                    const dateStr = toISODate(date);
-                                    const dayTasks = schedule.filter(t => t.date === dateStr);
-                                    return (
-                                        <div key={dateStr} className={`border-r border-white/60 relative min-w-[100px] ${isToday ? 'bg-white/50' : ''}`}>
-                                            <div className={`h-12 md:h-14 border-b border-white/60 sticky top-0 z-20 flex flex-col items-center justify-center ${isToday ? 'bg-aether-accent text-white shadow-md' : 'bg-white/80 text-aether-muted'}`}>
-                                                <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest">{DAYS[dayIdx]}</span>
-                                                <span className="text-base md:text-lg font-display font-bold leading-none">{date.getDate()}</span>
-                                            </div>
-                                            <div className="relative">
-                                                {isToday && <div className="absolute w-full z-20 pointer-events-none flex items-center" style={{top: `${(now.getHours() * (window.innerWidth < 768 ? 64 : 80)) + (now.getMinutes() * ((window.innerWidth < 768 ? 64 : 80)/60))}px`}}><div className="w-2 h-2 bg-aether-accent rounded-full -ml-1 shadow-sm"></div><div className="h-px bg-aether-accent w-full opacity-50"></div></div>}
-                                                {HOURS.map(h => <div key={h} className="h-16 md:h-20 border-b border-white/40" onDragOver={e=>e.preventDefault()} onDrop={(e) => handleDrop(e, dateStr, h)}></div>)}
-                                                {dayTasks.map(task => (
-                                                    <div key={task.id} onClick={() => setEditTask(task)} 
-                                                        className="absolute inset-x-0.5 md:inset-x-1 p-1 md:p-3 rounded-lg cursor-pointer bg-aether-dark text-white shadow-lg active:scale-95 transition-all z-10 flex flex-col justify-center overflow-hidden border border-white/10 group" 
-                                                        style={{
-                                                            top: `${task.startHour * (window.innerWidth < 768 ? 64 : 80) + 2}px`, 
-                                                            height: `${task.duration * (window.innerWidth < 768 ? 64 : 80) - 4}px`
-                                                        }}>
-                                                        <div className="font-bold text-[10px] md:text-xs leading-tight truncate">{task.title}</div>
-                                                        <div className="text-[8px] md:text-[10px] opacity-70 mt-0.5">{task.duration}h</div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )
-                                })}
-                            </div>
-                        </div>
-                    </div>
-                );
-            };
-
-            // EDIT MODAL
-            const editModal = editTask ? (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center px-4">
-                    <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setEditTask(null)}></div>
-                    <div className="bg-white border border-gray-200 p-6 md:p-8 rounded-[32px] w-full max-w-sm shadow-2xl relative z-10 animate-soft-rise">
-                        <h3 className="font-display font-bold text-2xl mb-6 text-aether-dark">Edit Session</h3>
-                        <div className="space-y-6">
-                            <div><label className={STYLES.LABEL_SMALL}>Title</label><input value={editTask.title} onChange={e => setEditTask({...editTask, title: e.target.value})} className={STYLES.INPUT_GLASS}/></div>
-                            <div className="flex gap-4">
-                                <div className="flex-1"><label className={STYLES.LABEL_SMALL}>Start (24h)</label><input type="number" min="0" max="23" value={editTask.startHour} onChange={e=>setEditTask({...editTask, startHour:parseInt(e.target.value)})} className={STYLES.INPUT_GLASS}/></div>
-                                <div className="flex-1"><label className={STYLES.LABEL_SMALL}>Hours</label><input type="number" min="1" max="12" value={editTask.duration} onChange={e=>setEditTask({...editTask, duration:parseInt(e.target.value)})} className={STYLES.INPUT_GLASS}/></div>
-                            </div>
-                        </div>
-                        <div className="flex justify-between items-center pt-8 mt-4">
-                            <button onClick={deleteTask} className="btn-control danger text-red-500 border-red-100 hover:bg-red-500 hover:text-white hover:border-red-500"><Icon name="trash" size={14}/> Delete</button> 
-                            <div className="flex gap-3">
-                                <button onClick={()=>setEditTask(null)} className="text-sm font-bold text-aether-muted hover:text-aether-dark px-4 py-2">Cancel</button>
-                                <button onClick={saveEdit} className="bg-aether-dark text-white rounded-lg px-6 py-2 font-bold shadow-lg hover:bg-aether-accent transition-all text-sm">Save</button>
-                            </div>
-                        </div>
-                    </div>
+                  <div className="flex gap-2 flex-wrap">
+                    <button className={`btn-control ${scope==="TODAY" ? "bg-aether-dark text-white border-white/10 hover:bg-aether-dark" : ""}`} onClick={()=>setScope("TODAY")}>
+                      Today
+                    </button>
+                    <button className={`btn-control ${scope==="UPCOMING" ? "bg-aether-dark text-white border-white/10 hover:bg-aether-dark" : ""}`} onClick={()=>setScope("UPCOMING")}>
+                      Upcoming
+                    </button>
+                    <button className={`btn-control ${scope==="ALL" ? "bg-aether-dark text-white border-white/10 hover:bg-aether-dark" : ""}`} onClick={()=>setScope("ALL")}>
+                      All
+                    </button>
+                  </div>
                 </div>
-            ) : null;
 
-            // HEADER LABEL
-            const getHeaderLabel = () => {
-                if(viewMode === 'decade') { const start = Math.floor(focusDate.getFullYear() / 10) * 10; return `${start} - ${start + 9}`; }
-                if(viewMode === 'year') return `${focusDate.getFullYear()}`;
-                return `${MONTHS[focusDate.getMonth()]} ${focusDate.getFullYear()}`;
-            }
-
-            return (
-                <div className="h-full flex flex-col animate-soft-rise relative overflow-hidden">
-                    {/* NAVIGATION BAR */}
-                    <div className="px-4 md:px-6 py-3 md:py-4 border-b border-white/60 bg-white/60 sticky top-0 z-30 backdrop-blur-xl flex flex-col md:flex-row gap-3 md:gap-4 justify-between items-stretch md:items-center shadow-sm">
-                        <div className="flex items-center justify-between w-full md:w-auto gap-2">
-                            <div className="flex items-center gap-2">
-                                <button onClick={() => navigate(-1)} className="w-8 h-8 md:w-10 md:h-10 bg-[#1D1D1F] rounded-lg flex items-center justify-center text-white shadow-lg hover:bg-[#FF4F00] active:scale-95 transition-all duration-200 z-50 relative" title="Previous">
-                                    <Icon name="arrow-left" size={16} strokeWidth={3} />
-                                </button>
-                                <button onClick={() => navigate(1)} className="w-8 h-8 md:w-10 md:h-10 bg-[#1D1D1F] rounded-lg flex items-center justify-center text-white shadow-lg hover:bg-[#FF4F00] active:scale-95 transition-all duration-200 z-50 relative" title="Next">
-                                    <Icon name="arrow-right" size={16} strokeWidth={3} />
-                                </button>
-                                <button onClick={goToToday} className="ml-1 px-2 py-1 text-[10px] font-bold uppercase text-aether-muted hover:text-aether-accent tracking-widest transition-colors">Today</button>
-                            </div>
-                            <h2 className="font-display font-bold text-xl md:text-2xl text-aether-dark whitespace-nowrap">{getHeaderLabel()}</h2>
-                        </div>
-
-                        <div className="flex overflow-x-auto pb-1 md:pb-0 hide-scrollbar justify-between md:justify-end gap-2">
-                             <div className="flex bg-gray-100/50 p-1 rounded-lg border border-gray-200/50 shrink-0">
-                                {['Week', 'Month', 'Year', 'Decade'].map(m => (
-                                    <button key={m} onClick={() => setViewMode(m.toLowerCase())} className={`px-2 md:px-3 py-1 rounded-md text-[10px] md:text-xs font-bold uppercase transition-all ${viewMode === m.toLowerCase() ? 'bg-white text-aether-dark shadow-sm' : 'text-aether-muted hover:text-aether-dark'}`}>{m}</button>
-                                ))}
-                            </div>
-                             {/* Task Adder - Simplified for mobile */}
-                            {viewMode === 'week' && (
-                                <div className="flex items-center bg-white rounded-full border border-gray-200 p-1 shadow-sm shrink-0">
-                                    <div draggable onDragStart={(e) => handleDragStart(e, 'LIBRARY', {title: "New Task", duration: 1})} className="w-6 h-6 md:w-8 md:h-8 bg-aether-dark rounded-full flex items-center justify-center text-white cursor-grab active:cursor-grabbing"><Icon name="plus" size={14}/></div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {viewMode === 'decade' && <DecadeView />}
-                    {viewMode === 'year' && <YearView />}
-                    {viewMode === 'month' && <MonthView />}
-                    {viewMode === 'week' && <WeekView />}
-
-                    {editTask && ReactDOM.createPortal(editModal, document.body)}
+                <div className="mt-4 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3 items-center">
+                  <input className="input-glass" value={q} onChange={e=>setQ(e.target.value)} placeholder="Search tasks (title/date/status/priority)..." />
+                  <button className="btn-control" onClick={openAddTask}><Icon name="plus" /> Add</button>
                 </div>
-            );
-        };
 
-        // --- 4. DAY VIEW (Adapted for vertical stacking) ---
-        const DayView = ({ schedule, todos, toggleTodo, gainXp, now, setTodos }) => {
-            const currentHour = now.getHours();
-            const todayStr = toISODate(now);
-            
-            const sortedSchedule = useMemo(() => schedule.filter(t => t.date === todayStr).sort((a,b) => a.startHour - b.startHour), [schedule, todayStr]);
-            const [focusDuration, setFocusDuration] = useState(25);
-            const [timeLeft, setTimeLeft] = useState(25 * 60);
-            const [isActive, setIsActive] = useState(false);
-            const [newTodo, setNewTodo] = useState("");
+                <div className="mt-5 space-y-2">
+                  {filteredTasks.length === 0 && (
+                    <div className="text-aether-muted font-semibold">No tasks match this view.</div>
+                  )}
 
-            useEffect(() => { 
-                let interval = null;
-                if (isActive && timeLeft > 0) interval = setInterval(() => setTimeLeft(t => t - 1), 1000);
-                else if (timeLeft === 0 && isActive) { setIsActive(false); gainXp(50); alert("Session Complete."); }
-                return () => clearInterval(interval); 
-            }, [isActive, timeLeft]);
-
-            const handleDurationChange = (e) => { const val = parseInt(e.target.value) || 0; setFocusDuration(val); if (!isActive) setTimeLeft(val * 60); };
-            const addTodo = () => { if(newTodo.trim()) { setTodos([...todos, {id: Date.now(), text: newTodo, done: false}]); setNewTodo(""); }};
-            
-            return (
-                <div className="max-w-4xl mx-auto pt-6 md:pt-10 pb-32 px-4 md:px-6 animate-soft-rise">
-                    <div className="aerogel-card rounded-3xl p-8 md:p-12 mb-8 md:mb-10 text-center relative overflow-hidden">
-                        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-aether-secondary via-aether-accent to-aether-secondary opacity-50"></div>
-                        <div className="inline-flex flex-col items-center relative z-10">
-                            <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-aether-muted mb-6 md:mb-8">Focus Session</div>
-                            <div className="font-display font-bold text-7xl md:text-9xl text-aether-dark tabular-nums tracking-tighter mb-8 md:mb-10">
-                                {Math.floor(timeLeft/60).toString().padStart(2,'0')}<span className="text-gray-300">:</span>{(timeLeft%60).toString().padStart(2,'0')}
-                            </div>
-                            <div className="flex items-center gap-3 md:gap-4 bg-white p-2 pr-3 rounded-full shadow-lg border border-gray-100">
-                                <div className="px-4 md:px-6 border-r border-gray-200">
-                                    <input type="number" value={focusDuration} onChange={handleDurationChange} className="w-10 md:w-12 text-center font-bold text-lg md:text-xl text-aether-dark bg-transparent outline-none"/>
-                                    <span className="text-[9px] md:text-[10px] font-bold text-aether-muted uppercase block">Min</span>
-                                </div>
-                                <button onClick={() => setIsActive(!isActive)} className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-white transition-all shadow-md active:scale-95 ${isActive ? 'bg-aether-accent' : 'bg-aether-dark'}`}>
-                                    <Icon name={isActive ? "pause" : "play"} size={20} fill="currentColor" />
-                                </button>
-                                <button onClick={() => {setIsActive(false); setTimeLeft(focusDuration * 60);}} className="w-10 h-10 rounded-full bg-gray-100 text-aether-muted hover:text-aether-dark hover:bg-gray-200 flex items-center justify-center transition-colors active:scale-95"><Icon name="rotate-ccw" size={16} /></button>
-                            </div>
+                  {filteredTasks.map(t=>(
+                    <div key={t.id} className="aerogel-card p-4 bg-white/55 flex items-center justify-between gap-4">
+                      <button onClick={()=>toggleTask(t.id)} className="flex items-center gap-3 min-w-0 flex-1 text-left active:scale-[0.99] transition-transform">
+                        <div className={`w-10 h-10 rounded-xl border shadow-sm flex items-center justify-center ${t.status==="DONE" ? "bg-aether-dark border-white/10" : "bg-white border-white/60"}`}>
+                          <Icon name={t.status==="DONE" ? "check" : "circle"} size={18} className={t.status==="DONE" ? "text-white" : "text-aether-dark"} />
                         </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-                        <div className="aerogel-card p-6 md:p-8">
-                            <h3 className="font-display font-bold text-xl md:text-2xl mb-4 md:mb-6 text-aether-dark">Timeline</h3>
-                            <div className="space-y-4">
-                                {sortedSchedule.map(t => {
-                                    const isPast = currentHour >= t.startHour + t.duration;
-                                    const isNow = currentHour >= t.startHour && currentHour < t.startHour + t.duration;
-                                    return (
-                                        <div key={t.id} className={`flex gap-3 md:gap-4 items-center transition-all ${isPast ? 'opacity-40' : ''}`}>
-                                            <div className="text-xs font-bold text-aether-muted w-10 md:w-12 text-right">{t.startHour}:00</div>
-                                            <div className={`flex-1 p-3 md:p-4 rounded-2xl border transition-all ${isNow ? 'bg-aether-dark text-white shadow-lg scale-105 border-transparent' : 'bg-white border-gray-100 text-aether-dark'}`}>
-                                                <div className="font-bold text-base md:text-lg">{t.title}</div>
-                                                <div className="text-[10px] md:text-xs opacity-70 uppercase tracking-wider mt-1">{t.duration} Hours</div>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                                {sortedSchedule.length === 0 && <div className="text-center py-10 text-aether-muted font-medium">No events for today.</div>}
-                            </div>
+                        <div className="min-w-0">
+                          <div className={`font-extrabold text-sm truncate ${t.status==="DONE" ? "line-through text-aether-muted" : "text-aether-dark"}`}>
+                            {t.title}
+                          </div>
+                          <div className="text-[11px] font-black uppercase tracking-[0.14em] text-aether-muted">
+                            {t.dueDate} • {t.priority} • {t.status}
+                          </div>
                         </div>
+                      </button>
 
-                        <div className="aerogel-card p-6 md:p-8">
-                            <div className="flex justify-between items-end mb-4 md:mb-6">
-                                <h3 className="font-display font-bold text-xl md:text-2xl text-aether-dark">Tasks</h3>
-                                {todos.length > 0 && <button onClick={()=>confirm("Clear?") && setTodos([])} className="btn-control danger text-red-500 border-red-100"><Icon name="trash-2" size={12}/> Clear</button>}
-                            </div>
-                            <div className="flex gap-2 mb-6">
-                                <input type="text" value={newTodo} onChange={(e) => setNewTodo(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && addTodo()} placeholder="Add task..." className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-aether-dark transition-colors"/>
-                                <button onClick={addTodo} className="bg-aether-dark text-white w-12 rounded-xl flex items-center justify-center active:bg-aether-accent transition-colors"><Icon name="plus" size={20}/></button>
-                            </div>
-                            <div className="space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar">
-                                {todos.map(t => (
-                                    <div key={t.id} onClick={() => { toggleTodo(t.id); if(!t.done) gainXp(10); }} className={`group flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all active:scale-95 ${t.done ? 'bg-transparent opacity-40' : 'bg-white border border-gray-100 hover:border-aether-secondary'}`}>
-                                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${t.done ? 'bg-aether-dark border-aether-dark text-white' : 'border-gray-300'}`}>
-                                            {t.done && <Icon name="check" size={12} />}
-                                        </div>
-                                        <span className={`flex-1 font-medium text-sm md:text-base ${t.done ? 'line-through decoration-2' : ''}`}>{t.text}</span>
-                                        <button 
-                                            onClick={(e) => { e.stopPropagation(); setTodos(todos.filter(x => x.id !== t.id)); }} 
-                                            className="w-8 h-8 rounded-lg border border-red-200 bg-red-50 text-red-500 flex items-center justify-center active:bg-red-500 active:text-white transition-all shadow-sm"
-                                        >
-                                            <Icon name="trash-2" size={16} />
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
+                      <div className="flex items-center gap-2">
+                        <button className="btn-control" onClick={()=>openEditTask(t)} title="Edit"><Icon name="pencil" size={16} /></button>
+                        <button className="btn-control danger" onClick={()=>deleteTask(t.id)} title="Delete"><Icon name="trash-2" size={16} /></button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="aerogel-card p-6 md:p-8">
+                <div className="flex items-center justify-between gap-4 flex-wrap">
+                  <div>
+                    <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted">Score split</div>
+                    <div className="font-display font-bold text-2xl text-aether-dark mt-2">Habits vs tasks</div>
+                  </div>
+                  <Pill><Icon name="sparkles" size={14} /> {op.toFixed(0)}%</Pill>
+                </div>
+                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <ProgressBar label="Habits" pct={hp} />
+                  <ProgressBar label="Tasks" pct={tp} />
+                </div>
+              </div>
+            </div>
+
+            {/* RIGHT: Focus + Habits + Notes */}
+            <div className="space-y-6">
+              <FocusClock store={store} setStore={setStore} />
+
+              <div className="aerogel-card p-6 md:p-8">
+                <div className="flex items-center justify-between gap-4 flex-wrap">
+                  <div>
+                    <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted">Habits</div>
+                    <div className="font-display font-bold text-2xl text-aether-dark mt-2">Checklist</div>
+                    <div className="text-aether-muted font-medium mt-2">Active habits only.</div>
+                  </div>
+                  <Pill><Icon name="check" size={14} /> {hp.toFixed(0)}%</Pill>
+                </div>
+
+                <div className="mt-5 space-y-2">
+                  {active.length===0 && (
+                    <div className="text-aether-muted font-semibold">No active habits. Turn some on in Habits.</div>
+                  )}
+                  {active.map(h=>{
+                    const done = getHabitDone(store, date, h.id);
+                    return (
+                      <button
+                        key={h.id}
+                        onClick={()=>toggleHabit(h.id)}
+                        className={`w-full aerogel-card p-4 text-left flex items-center justify-between gap-4 active:scale-[0.99] transition-transform
+                          ${done ? "bg-aether-dark text-white border-white/10" : "bg-white/55"}
+                        `}
+                      >
+                        <div className="min-w-0">
+                          <div className="font-extrabold text-sm truncate">{h.title}</div>
+                          <div className={`text-[11px] font-black uppercase tracking-[0.14em] ${done ? "text-white/70" : "text-aether-muted"}`}>{h.category}</div>
                         </div>
-                    </div>
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center border shadow-sm ${
+                          done ? "bg-white/10 border-white/10" : "bg-white border-white/60"
+                        }`}>
+                          <Icon name={done ? "check" : "circle"} size={18} className={done ? "text-white" : "text-aether-dark"} />
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
-            );
-        };
+              </div>
 
-        // --- 5. PROJECTS VIEW ---
-        const ProjectsView = ({ projects, setProjects, gainXp }) => {
-            const updateProject = (pid, fn) => setProjects(projects.map(p => p.id === pid ? fn(p) : p));
-            
-            const toggleMilestone = (pid, mid) => updateProject(pid, p => {
-                const newMs = p.milestones.map(m => m.id === mid ? { ...m, done: !m.done } : m);
-                if (newMs.find(m => m.id === mid).done && !p.milestones.find(m => m.id === mid).done) { gainXp(25); triggerConfetti(); }
-                return { ...p, milestones: newMs, progress: newMs.length ? Math.round((newMs.filter(m=>m.done).length / newMs.length) * 100) : 0 };
-            });
-
-            const editDetail = (pid, field, val) => { const n = prompt(`Edit ${field}:`, val); if(n) updateProject(pid, p => ({...p, [field]: n})); };
-            const addMilestone = (pid) => { const m = prompt("Milestone:"); if(m) updateProject(pid, p => { const nM = [...p.milestones, {id:Date.now(), text:m, done:false}]; return {...p, milestones: nM, progress: Math.round((nM.filter(x=>x.done).length/nM.length)*100)};}); };
-            
-            return (
-                <div className="max-w-5xl mx-auto pt-8 md:pt-12 pb-32 px-4 md:px-6 animate-soft-rise">
-                    <div className="flex justify-between items-end mb-8 md:mb-12 border-b border-black/5 pb-4 md:pb-6">
-                        <h2 className="font-display font-bold text-3xl md:text-4xl text-aether-dark">Projects</h2>
-                        <button onClick={() => {const t=prompt("Title:"); if(t) setProjects([...projects, {id:Date.now(), title:t, category:'General', progress:0, milestones:[]}])}} className={STYLES.BTN_ACCENT}><Icon name="plus" size={16} /> <span className="hidden md:inline">Create Project</span></button>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-                        {projects.map(p => (
-                            <div key={p.id} className="aerogel-card p-6 md:p-8 group">
-                                <div className="flex justify-between items-start mb-6">
-                                    <span onClick={() => editDetail(p.id, 'category', p.category)} className="px-3 py-1 rounded-full bg-gray-100 text-xs font-bold uppercase tracking-wider text-aether-muted active:bg-aether-dark active:text-white cursor-pointer transition-colors">{p.category}</span>
-                                    <div className="flex gap-2">
-                                        <button onClick={() => editDetail(p.id, 'title', p.title)} className="btn-control"><Icon name="pencil" size={12} /> Edit</button>
-                                        <button onClick={() => confirm("Delete?") && setProjects(projects.filter(x=>x.id!==p.id))} className="btn-control danger text-red-500 border-red-100"><Icon name="trash" size={12} /></button>
-                                    </div>
-                                </div>
-                                <div className="mb-8">
-                                    <h3 className="font-display font-bold text-2xl md:text-3xl text-aether-dark mb-2">{p.title}</h3>
-                                    <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
-                                        <div className="h-full bg-aether-leaf transition-all duration-700 ease-out rounded-full" style={{width: `${p.progress}%`}}></div>
-                                    </div>
-                                    <div className="text-right text-xs font-bold text-aether-muted mt-1">{p.progress}%</div>
-                                </div>
-                                <div className="space-y-3">
-                                    {p.milestones.map(m => (
-                                        <div key={m.id} onClick={() => toggleMilestone(p.id, m.id)} className="flex items-center justify-between p-3 rounded-xl hover:bg-white active:bg-white transition-colors cursor-pointer group/item border border-transparent hover:border-gray-100">
-                                            <div className="flex gap-4 items-center flex-1">
-                                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${m.done ? 'bg-aether-secondary border-aether-secondary scale-90' : 'border-gray-300'}`}>
-                                                    {m.done && <Icon name="check" size={10} className="text-white" strokeWidth={4} />}
-                                                </div>
-                                                <span className={`font-medium transition-all text-sm md:text-base ${m.done ? 'text-gray-400 line-through' : 'text-aether-dark'}`}>{m.text}</span>
-                                            </div>
-                                            <button onClick={(e) => {e.stopPropagation(); updateProject(p.id, pr => ({...pr, milestones: pr.milestones.filter(x=>x.id!==m.id)}))}} className="btn-control h-7 w-7 !p-0 !rounded-full text-gray-400 hover:text-red-500"><Icon name="x" size={14} /></button>
-                                        </div>
-                                    ))}
-                                    <button onClick={() => addMilestone(p.id)} className="w-full py-3 mt-2 border-2 border-dashed border-gray-200 rounded-xl text-xs font-bold text-gray-400 uppercase hover:border-aether-dark hover:text-aether-dark transition-colors flex items-center justify-center gap-2">Add Milestone</button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+              <div className="aerogel-card p-6 md:p-8">
+                <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted">Notes</div>
+                <div className="font-display font-bold text-2xl text-aether-dark mt-2">Daily log</div>
+                <div className="mt-4">
+                  <textarea
+                    className="input-glass"
+                    style={{ minHeight: "180px", resize: "vertical" }}
+                    value={note}
+                    onChange={e=>setNote(e.target.value)}
+                    placeholder="What mattered today? What’s the one improvement for tomorrow?"
+                  ></textarea>
                 </div>
-            );
-        };
-
-        const App = () => {
-            const [view, setView] = useState('home');
-            const [xp, setXp] = useState(0);
-            const [now, setNow] = useState(new Date());
-            
-            // INITIAL DATA
-            const todayStr = toISODate(new Date());
-            const [schedule, setSchedule] = useState([
-                {id:'1',title:'Morning Flow',duration:1,date: todayStr,startHour:8},
-                {id:'2',title:'Deep Work',duration:3,date: todayStr,startHour:10}
-            ]);
-            
-            const [todos, setTodos] = useState([{id:1,text:"Review Design",done:false},{id:2,text:"Client Call",done:true},{id:3,text:"Read Documentation",done:false}]);
-            const [projects, setProjects] = useState([{id:1,title:"Portfolio Revamp",category:"Design",progress:50,milestones:[{id:1,text:"Wireframes",done:true},{id:2,text:"Visuals",done:false}]}]);
-
-            useEffect(() => { const t = setInterval(() => setNow(new Date()), 60000); return () => clearInterval(t); }, []);
-            
-            const gainXp = (am) => { 
-                setXp(p => { 
-                    const n = p + am; 
-                    if(Math.floor(n/100) > Math.floor(p/100)) { confetti({colors:['#FF4F00', '#0066CC', '#E8E0D5'], zIndex: 100}); } 
-                    return n; 
-                }) 
-            };
-            
-            const toggleTodo = (id) => setTodos(todos.map(t => t.id === id ? {...t, done: !t.done} : t));
-            
-            const currentTask = useMemo(() => {
-                const todayStr = toISODate(now);
-                const h = now.getHours();
-                return schedule.find(t => t.date === todayStr && h >= t.startHour && h < t.startHour + t.duration);
-            }, [schedule, now]);
-
-            const stats = { tasksLeft: todos.filter(t=>!t.done).length, completion: todos.length > 0 ? Math.round((todos.filter(t=>t.done).length/todos.length)*100) : 0, currentTask, upcomingTodos: todos.filter(t=>!t.done).slice(0, 3) };
-
-            return (
-                <div className="min-h-screen selection:bg-aether-accent selection:text-white">
-                    {view === 'home' && <HomeView xp={xp} stats={stats} now={now} />}
-                    {view === 'week' && <WeeklyPlanner schedule={schedule} setSchedule={setSchedule} now={now} />}
-                    {view === 'day' && <DayView schedule={schedule} todos={todos} toggleTodo={toggleTodo} gainXp={gainXp} now={now} setTodos={setTodos} />}
-                    {view === 'projects' && <ProjectsView projects={projects} setProjects={setProjects} gainXp={gainXp} />}
-                    <CommandDock view={view} setView={setView} />
+                <div className="mt-3 flex gap-2">
+                  <button className="btn-control w-full" onClick={saveNote}><Icon name="save" /> Save note</button>
                 </div>
-            );
-        };
+              </div>
+            </div>
+          </div>
 
-        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
-    </script>
+          <Modal
+            open={openTaskModal}
+            title={taskEdit?.id ? "Edit task" : "Add task"}
+            subtitle="Today — Tasks"
+            onClose={()=>setOpenTaskModal(false)}
+          >
+            <div className="space-y-4">
+              <div>
+                <label className="label-small">Title</label>
+                <input className="input-glass" value={taskEdit?.title || ""} onChange={e=>setTaskEdit(s=>({...s, title:e.target.value}))} placeholder="e.g., Finish lab report" />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className="label-small">Due date</label>
+                  <input className="input-glass" type="date" value={taskEdit?.dueDate || ""} onChange={e=>setTaskEdit(s=>({...s, dueDate:e.target.value}))} />
+                </div>
+                <div>
+                  <label className="label-small">Priority</label>
+                  <select className="input-glass" value={taskEdit?.priority || "MED"} onChange={e=>setTaskEdit(s=>({...s, priority:e.target.value}))}>
+                    <option value="LOW">LOW</option>
+                    <option value="MED">MED</option>
+                    <option value="HIGH">HIGH</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="label-small">Status</label>
+                <select className="input-glass" value={taskEdit?.status || "OPEN"} onChange={e=>setTaskEdit(s=>({...s, status:e.target.value}))}>
+                  <option value="OPEN">OPEN</option>
+                  <option value="DONE">DONE</option>
+                </select>
+              </div>
+
+              <div className="flex gap-2">
+                <button className="btn-control flex-1" onClick={()=>setOpenTaskModal(false)}><Icon name="x" /> Cancel</button>
+                <button className="btn-control btn-primary bg-aether-dark text-white hover:bg-aether-accent flex-1" onClick={saveTask}>
+                  <Icon name="save" /> Save
+                </button>
+              </div>
+            </div>
+          </Modal>
+        </div>
+      );
+    }
+
+    // ---- Settings ----
+    function Settings({ store, setStore }){
+      const [name, setName] = useState(store.profile?.name || "User");
+      const [blob, setBlob] = useState("");
+      useEffect(()=> setName(store.profile?.name || "User"), [store.profile?.name]);
+
+      const saveProfile = ()=>{
+        setStore(prev=>{
+          const n = deepClone(prev);
+          n.profile = n.profile || {};
+          n.profile.name = name.trim() || "User";
+          return normalizeFocus(n);
+        });
+        toast("Profile saved.");
+      };
+
+      const exportJSON = ()=>{
+        const data = JSON.stringify(store, null, 2);
+        setBlob(data);
+        toast("Export ready.");
+      };
+
+      const importJSON = ()=>{
+        try{
+          const parsed = JSON.parse(blob);
+          if(!parsed || typeof parsed !== "object") throw new Error("Invalid JSON");
+          if(!parsed.profile || !parsed.habits || !parsed.tasks) throw new Error("Missing fields (profile/habits/tasks).");
+          setStore(normalizeFocus(parsed));
+          toast("Imported.");
+        }catch(e){
+          toast(e.message || "Import failed.", "err");
+        }
+      };
+
+      const resetAll = ()=>{
+        if(!confirm("Reset all data (habits/tasks/logs/notes)?")) return;
+        setStore(defaultStore(store.profile?.name || "User"));
+        toast("Reset done.");
+      };
+
+      return (
+        <div className="space-y-6 animate-soft-rise">
+          <div className="aerogel-card p-6 md:p-10 relative overflow-hidden">
+            <div className="absolute -right-24 -top-24 w-72 h-72 bg-aether-sand/40 rounded-full blur-3xl"></div>
+            <div className="relative z-10">
+              <Pill><Icon name="sliders-horizontal" size={14} /> Settings</Pill>
+              <h1 className="font-display font-bold text-4xl md:text-5xl text-aether-dark mt-4 tracking-tight">
+                Control panel
+              </h1>
+              <p className="text-aether-muted font-medium mt-3">
+                Profile, export/import, reset.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            <div className="xl:col-span-2 space-y-6">
+              <div className="aerogel-card p-6 md:p-8">
+                <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted">Profile</div>
+                <div className="font-display font-bold text-2xl text-aether-dark mt-2">Your name</div>
+
+                <div className="mt-4 space-y-3">
+                  <div>
+                    <label className="label-small">Display name</label>
+                    <input className="input-glass" value={name} onChange={e=>setName(e.target.value)} placeholder="Your name" />
+                  </div>
+                  <button className="btn-control btn-primary bg-aether-dark text-white hover:bg-aether-accent px-6 py-3 w-full" onClick={saveProfile}>
+                    <Icon name="save" /> Save
+                  </button>
+                </div>
+              </div>
+
+              <div className="aerogel-card p-6 md:p-8">
+                <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted">Data</div>
+                <div className="font-display font-bold text-2xl text-aether-dark mt-2">Export / Import</div>
+                <p className="text-aether-muted font-medium mt-2">
+                  Backup your local data (habits/tasks/logs/notes/focus).
+                </p>
+
+                <div className="mt-4 flex gap-2 flex-wrap">
+                  <button className="btn-control" onClick={exportJSON}><Icon name="download" /> Export</button>
+                  <button className="btn-control" onClick={importJSON}><Icon name="upload" /> Import</button>
+                  <button className="btn-control danger" onClick={resetAll}><Icon name="trash-2" /> Reset</button>
+                </div>
+
+                <div className="mt-4">
+                  <label className="label-small">JSON</label>
+                  <textarea
+                    className="input-glass"
+                    style={{ minHeight: "220px", resize: "vertical" }}
+                    value={blob}
+                    onChange={e=>setBlob(e.target.value)}
+                    placeholder="Click Export to generate JSON here, or paste JSON to Import."
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <div className="aerogel-card p-6 md:p-8">
+                <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted">Storage</div>
+                <div className="font-display font-bold text-2xl text-aether-dark mt-2">Where it lives</div>
+                <p className="text-aether-muted font-medium mt-3">
+                  Everything is saved in your browser’s localStorage for this device/profile.
+                </p>
+              </div>
+
+              <div className="aerogel-card p-6 md:p-8">
+                <div className="text-xs font-black uppercase tracking-[0.14em] text-aether-muted">Warning</div>
+                <div className="font-display font-bold text-2xl text-aether-dark mt-2">Prototype security</div>
+                <p className="text-aether-muted font-medium mt-3">
+                  Login passwords are stored locally (not secure). Use only for demos.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ---- App Root ----
+    function App(){
+      const { hash } = useHashRoute();
+      const [user, setUser] = useState(Auth.me());
+      const [store, setStore] = useState(()=> user ? normalizeFocus(Data.load(user.id) || defaultStore(user.name)) : null);
+
+      // Backward-compat redirect: #/app/day/YYYY-MM-DD -> #/app/today/YYYY-MM-DD
+      useEffect(()=>{
+        if((window.location.hash || "").startsWith("#/app/day/")){
+          window.location.hash = window.location.hash.replace("#/app/day/", "#/app/today/");
+        }
+      }, [hash]);
+
+      useEffect(()=>{
+        if(user && store) Data.save(user.id, store);
+      }, [user, store]);
+
+      useEffect(()=>{
+        const u = Auth.me();
+        setUser(u);
+        if(u){
+          const s0 = Data.load(u.id) || defaultStore(u.name);
+          const s = normalizeFocus(s0);
+          setStore(s);
+        }else{
+          setStore(null);
+        }
+      }, [hash]);
+
+      useEffect(() => {
+        if (hash.startsWith("#/app/")) {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+      }, [hash]);
+
+      const goApp = (page, date=null)=>{
+        if(page==="today"){
+          const d = date || toISODate(new Date());
+          window.location.hash = `#/app/today/${d}`;
+        } else {
+          window.location.hash = `#/app/${page}`;
+        }
+      };
+
+      const logout = ()=>{
+        Auth.logout();
+        toast("Logged out.");
+        window.location.hash = "#/";
+      };
+
+      if(!user){
+        if(hash.startsWith("#/signup")) return <Signup onDone={()=>{ window.location.hash="#/app/dashboard"; }} />;
+        if(hash.startsWith("#/login")) return <Login onDone={()=>{ window.location.hash="#/app/dashboard"; }} />;
+        return <Landing />;
+      }
+
+      const parts = (hash || "#/app/dashboard").replace("#/","").split("/");
+      let route = parts[1] || "dashboard";
+      let todayDate = null;
+      if(route==="today") todayDate = parts[2] || toISODate(new Date());
+
+      return (
+        <div className="min-h-screen selection:bg-aether-accent selection:text-white">
+          <div className="w-full max-w-none px-3 md:px-4 lg:pl-3 lg:pr-8 pt-5 md:pt-8 pb-12">
+            <div className="grid grid-cols-1 lg:grid-cols-[210px_minmax(0,1fr)] gap-6 items-start">
+              <Sidebar
+                route={route}
+                go={(r)=>goApp(r)}
+                userName={store?.profile?.name || user.name}
+                onLogout={logout}
+              />
+
+              <main key={hash} className="pb-10 nav-enter min-w-0 w-full">
+                {route==="dashboard" && <Dashboard store={store} setStore={setStore} goApp={goApp} />}
+                {route==="today" && <Today store={store} setStore={setStore} dateISO={todayDate} />}
+                {route==="week" && <Week store={store} goApp={goApp} />}
+                {route==="habits" && <Habits store={store} setStore={setStore} />}
+                {route==="settings" && <Settings store={store} setStore={setStore} />}
+
+                {(!["dashboard","today","week","habits","settings"].includes(route)) && (
+                  <div className="aerogel-card p-6 md:p-8">
+                    <div className="font-display font-bold text-2xl text-aether-dark">Unknown route</div>
+                    <p className="text-aether-muted font-medium mt-2">Go back to dashboard.</p>
+                    <button className="btn-control mt-4" onClick={()=>goApp("dashboard")}><Icon name="arrow-left" /> Dashboard</button>
+                  </div>
+                )}
+              </main>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
 </body>
 </html>
